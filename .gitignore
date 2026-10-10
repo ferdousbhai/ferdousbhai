@@ -1,0 +1,13 @@
+node_modules
+.wrangler
+.cloudflare
+*.log
+
+# Everything the build writes; content/ and scripts/ are the source.
+public/*.html
+public/*.md
+public/llms.txt
+public/llms-full.txt
+public/robots.txt
+public/sitemap.xml
+public/_headers
