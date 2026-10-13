@@ -19,19 +19,26 @@ Three parts, each usable alone:
 
 Give your ghost a job: tidy a folder, fill in a form on a site you're signed into, check something every morning, or hand a coding task to your other agents and report back. It keeps going on long tasks and asks when a decision is yours. Each ghost has its own character and keeps its notes as plain files in your Documents.
 
-One command adds the signed package repository and its key, then installs Ghost; `omarchy update` keeps it current. Run it as yourself; it asks for sudo when needed.
+Ghost is available directly from Omarchy's package repository; `omarchy update` keeps it current.
 
 ```sh
-curl -fsSL https://ferdousbhai.com/ghost/install.sh | bash
+omarchy pkg add ghost
 ```
 
-Then start the daemon and enable the desktop plugin:
+Start the daemon and enable the desktop plugin in your login:
 
 ```sh
 systemctl --user enable --now ghostd.service
-ln -sfn /usr/share/ghost/plugin ~/.config/omarchy/plugins/ferdousbhai.ghost
+mkdir -p ~/.config/omarchy/plugins
+ln -sfnT /usr/share/ghost/plugin ~/.config/omarchy/plugins/ferdousbhai.ghost
 omarchy-shell shell rescanPlugins
 omarchy plugin enable ferdousbhai.ghost
+```
+
+If you installed from the old `[ghost]` repository, run the installer once to remove it. The installer now uses Omarchy's package repository and performs the setup above. Run it as yourself; it asks for sudo when needed.
+
+```sh
+curl -fsSL https://ferdousbhai.com/ghost/install.sh | bash
 ```
 
 Open Ghost from the app launcher, or from the terminal: `ghost new <name>` makes a ghost and `ghost use <name>` selects it. Sign in through each agent's own CLI. `ghost harnesses` lists the available agents; `ghost switch codex` moves the current conversation to another agent, history intact.
