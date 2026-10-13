@@ -1,11 +1,11 @@
 ---
 title: iCloud for Omarchy
-description: Apple Notes, Photos and Find My as native Omarchy apps on one iCloud sign-in.
+description: Apple Notes, Photos, Find My, Reminders and Contacts as native Omarchy apps on one iCloud sign-in.
 ---
 
 # iCloud for Omarchy
 
-Apple Notes, Photos and Find My as native [Omarchy](https://omarchy.org) apps. Sign in once, on Apple's own page, and all three use it.
+Apple Notes, Photos, Find My, Reminders and Contacts as native [Omarchy](https://omarchy.org) apps. Sign in once, on Apple's own page, and all five use it.
 
 Find My asks for your Apple password now and then, as icloud.com does. Store it in the keyring once and it signs itself back in:
 
@@ -17,13 +17,13 @@ Or pipe it from a password manager: `bw get password "Apple ID" | icloud-session
 
 ## Install
 
-One command adds the signed package repository and its key, then installs all three apps; `omarchy update` keeps them current.
+One command adds the signed package repository and its key, then installs all five apps; `omarchy update` keeps them current.
 
 ```sh
 curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash
 ```
 
-Each app also installs alone (below) and has a CLI: `icloud-notes --help`, `icloud-photos --help`, `icloud-findmy --help`.
+Each app also installs alone (below) and has a CLI: `icloud-notes --help`, `icloud-photos --help`, `icloud-findmy --help`, `icloud-reminders --help`, `icloud-contacts --help`.
 
 ## Notes {#notes}
 
@@ -57,6 +57,22 @@ Your devices on a map, with battery, last-seen time and a trail of where each ha
 curl -fsSL https://ferdousbhai.com/icloud-findmy/install.sh | sudo bash
 ```
 
+## Reminders {#reminders}
+
+Browse your lists, add or complete reminders, and get a desktop notification when one falls due, even with the window closed.
+
+```sh
+curl -fsSL https://ferdousbhai.com/icloud-reminders/install.sh | sudo bash
+```
+
+## Contacts {#contacts}
+
+Search your address book, add and edit contacts, copy a number, start an email, or export a vCard.
+
+```sh
+curl -fsSL https://ferdousbhai.com/icloud-contacts/install.sh | sudo bash
+```
+
 ## Requirements
 
 - Omarchy, or any Arch Linux desktop.
@@ -66,4 +82,4 @@ curl -fsSL https://ferdousbhai.com/icloud-findmy/install.sh | sudo bash
 
 - [Source and issues](https://github.com/ferdousbhai/icloud-for-omarchy)
 - [Releases](https://github.com/ferdousbhai/icloud-for-omarchy/releases)
-- The install scripts, to read before running: [all three apps](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh), [Notes](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh), [Photos](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh), [Find My](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh)
+- The install scripts, to read before running: [all five apps](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh), [Notes](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh), [Photos](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh), [Find My](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh), [Reminders](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh), [Contacts](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-contacts.sh)

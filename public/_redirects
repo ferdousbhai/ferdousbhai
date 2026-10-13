@@ -7,6 +7,8 @@
 /ghost/install.sh https://github.com/ferdousbhai/ghost/releases/latest/download/install.sh 302
 /icloud-findmy/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh 302
 /icloud-photos/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh 302
+/icloud-reminders/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh 302
+/icloud-contacts/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-contacts.sh 302
 /icloud/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh 302
 /cloudmail/install.sh https://github.com/ferdousbhai/cloud-mail/releases/latest/download/install.sh 302
 
