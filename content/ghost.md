@@ -1,11 +1,11 @@
 ---
 title: Ghost
-description: Personal AI agents that live on your Omarchy computer and work your apps, browser and files for you.
+description: An orchestration layer for all your agent harnesses on Omarchy.
 ---
 
 # Ghost
 
-A ghost is a personal AI agent on your [Omarchy](https://omarchy.org) computer. It works your apps, browser and files as you would, through the agent CLIs you already use (Claude Code, Codex, Grok, OpenCode, pi) on their own sign-ins and limits. The ghost and your files stay on your computer.
+Ghost is an orchestration layer for all your agent harnesses on [Omarchy](https://omarchy.org). It coordinates the agent CLIs you already use (Claude Code, Codex, Grok, OpenCode, pi), keeping each harness's own sign-ins, tools and limits. Give a ghost a character and a job; it uses those harnesses to work your apps, browser and files. Ghost and your files stay on your computer.
 
 Three parts, each usable alone:
 

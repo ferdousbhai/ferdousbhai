@@ -11,7 +11,7 @@ summary: Personal site of Ferdous. Software projects: {projects}.
 
 ### Omarchy
 
-- [Ghost](https://ferdousbhai.com/ghost): A personal AI agent that works your Omarchy apps, browser and files through the agent CLIs you already use.
+- [Ghost](https://ferdousbhai.com/ghost): An orchestration layer for all your agent harnesses on Omarchy.
 - [iCloud for Omarchy](https://ferdousbhai.com/icloud): Apple Notes, Photos and Find My as native apps.
 - [Omacloud](https://github.com/ferdousbhai/omacloud): Your files and settings synced across Omarchy computers, end-to-end encrypted.
 - [Cloudmail](https://ferdousbhai.com/cloudmail): Email on your own domains, run from your own Cloudflare account, with a Screener for new senders. Gmail and HEY too.
