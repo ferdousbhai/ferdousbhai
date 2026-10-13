@@ -1,7 +1,8 @@
 # ferdousbhai.com
 
-One-page site on Cloudflare Workers static assets: no Worker script, no client-side JavaScript,
-no web font, no runtime dependencies.
+Small site on Cloudflare Workers static assets: no Worker script, no client-side JavaScript,
+no web font, no runtime dependencies. Agents read it through llms.txt and the markdown twins;
+there is no WebMCP, as there is no JavaScript to register tools with.
 
 ## Code index
 
@@ -18,7 +19,8 @@ no web font, no runtime dependencies.
   sized at build time), inline code and links. Blocks are separated by blank lines. A heading
   ending in `{#id}` gets that id, for links to a section.
 - `scripts/build.js` — renders all generated public representations: the pages, their markdown
-  twins, llms.txt, robots.txt, sitemap.xml, the stylesheet inlined in every page, and `_headers`
+  twins, llms.txt (the homepage markdown plus a page list) and llms-full.txt (every page's
+  markdown), robots.txt, sitemap.xml, the stylesheet inlined in every page, and `_headers`
   (cache policy and discovery Link headers per page, cache policy for assets), and every
   page's Open Graph and Twitter tags. `pnpm cards` also draws each route's 1200×630 share
   card (title, description and the page's first screenshot) with a headless Chromium into

@@ -652,7 +652,7 @@ const pageLinks = pages
 const llmsIndex =
   markdown.replace(
     "\n",
-    `\n\n> ${meta.summary}\n\nFull version in markdown: [index.md](${SITE_URL}${markdownPath("/")}); every page in one file at /llms-full.txt.\n`,
+    `\n\n> ${meta.summary}\n\nFull version in markdown: [index.md](${SITE_URL}${markdownPath("/")}); every page in one file: [llms-full.txt](${SITE_URL}/llms-full.txt).\n`,
   ) + `\n## Pages\n\n${pageLinks}\n`;
 
 const sitemapUrls = routes
