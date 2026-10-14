@@ -15,7 +15,7 @@ Recall comes with a native Omarchy search panel, a CLI, and a bundled skill so c
 curl -fsSL https://ferdousbhai.com/recall/install.sh | bash
 ```
 
-For Omarchy on x86_64 and aarch64. The installer downloads a checksum-verified release, installs dependencies through Omarchy, and sets up the desktop integration and agent skill. Model files and OCR assets download once; initial indexing takes time.
+For Omarchy on Intel/AMD PCs (x86_64) and ARM64 machines (aarch64). The installer automatically selects the right build, downloads a checksum-verified release, installs dependencies through Omarchy, and sets up the desktop integration and agent skill. Model files and OCR assets download once; initial indexing takes time.
 
 An Omarchy package repository submission is in progress. Use the installer above until the package reaches your configured channel.
 
