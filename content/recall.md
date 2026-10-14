@@ -44,7 +44,7 @@ recall skill
 recall skill install
 ```
 
-It installs to the shared agents skill directory and links Claude Code when available. Search covers only the folders you select. Audio results identify matching intervals; they do not provide word-level transcripts. Vulkan GPU acceleration is included, with CPU fallback. Apple Silicon Linux uses Asahi’s Honeykrisp driver; the installer adds it on Apple machines. GPU indexing has been validated on an M1 Max. Short interactive queries stay on CPU to avoid GPU startup latency.
+The CLI and background coordinator are native Rust; search and settings use the Omarchy QML panel. Python is required only for optional OCR, and GTK is not required. It installs to the shared agents skill directory and links Claude Code when available. Search covers only the folders you select. Audio results identify matching intervals; they do not provide word-level transcripts. Vulkan GPU acceleration is included, with CPU fallback. Apple Silicon Linux uses Asahi’s Honeykrisp driver; the installer adds it on Apple machines. GPU indexing has been validated on an M1 Max. Short interactive queries stay on CPU to avoid GPU startup latency.
 
 ## Open source
 
