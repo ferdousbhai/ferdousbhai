@@ -15,7 +15,7 @@ Recall comes with a native Omarchy search panel, a CLI, and a bundled skill so c
 curl -fsSL https://ferdousbhai.com/recall/install.sh | bash
 ```
 
-For Omarchy on Intel/AMD PCs (x86_64) and ARM64 machines (aarch64). The installer automatically selects the right build, downloads a checksum-verified release, installs dependencies through Omarchy, and sets up the desktop integration and agent skill. Model files and OCR assets download once; initial indexing takes time.
+For Omarchy on Intel/AMD PCs (x86_64) and ARM64 machines (aarch64). The installer automatically selects the right build, downloads a checksum-verified release, installs dependencies through Omarchy, and sets up the desktop integration and agent skill. Embedding model files download once; initial indexing takes time. OCR uses Omarchy’s bundled Tesseract and English language data, with no separate Python environment.
 
 An Omarchy package repository submission is in progress. Use the installer above until the package reaches your configured channel.
 
@@ -44,7 +44,7 @@ recall skill
 recall skill install
 ```
 
-The CLI and background coordinator are native Rust; search and settings use the Omarchy QML panel. Python is required only for optional OCR, and GTK is not required. The bundled skill installs to the shared agents skill directory and links Claude Code when available. Search covers only the folders you select. Audio results identify matching intervals; they do not provide word-level transcripts. Vulkan GPU acceleration is included, with CPU fallback. Apple Silicon Linux uses Asahi’s Honeykrisp driver; the installer adds it on Apple machines. GPU indexing has been validated on an M1 Max. Short interactive queries stay on CPU to avoid GPU startup latency.
+The CLI and background coordinator are native Rust; search and settings use the Omarchy QML panel. Python and GTK are not required at runtime. `recall ocr` reports available system OCR languages; additional Tesseract language packs can be installed through Omarchy. The bundled skill installs to the shared agents skill directory and links Claude Code when available. Search covers only the folders you select. Audio results identify matching intervals; they do not provide word-level transcripts. Vulkan GPU acceleration is included, with CPU fallback. Apple Silicon Linux uses Asahi’s Honeykrisp driver; the installer adds it on Apple machines. GPU indexing has been validated on an M1 Max. Short interactive queries stay on CPU to avoid GPU startup latency.
 
 ## Open source
 
