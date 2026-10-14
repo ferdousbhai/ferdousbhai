@@ -10,6 +10,7 @@
 /icloud-reminders/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh 302
 /icloud-contacts/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-contacts.sh 302
 /icloud/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh 302
+/recall/install.sh https://github.com/ferdousbhai/omarchy-recall/releases/latest/download/install.sh 302
 /cloudmail/install.sh https://github.com/ferdousbhai/cloud-mail/releases/latest/download/install.sh 302
 
 # iCloud Notes had its own page before the iCloud apps shared one; its old
