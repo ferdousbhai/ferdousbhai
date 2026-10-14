@@ -34,6 +34,7 @@ omarchy-recall search "payment error" --kind screenshot --limit 5
 omarchy-recall search "retry with exponential backoff" --code
 omarchy-recall text 123 --code
 omarchy-recall status
+omarchy-recall doctor
 ```
 
 The skill is bundled with the CLI. Print it or install it for your coding agents:
@@ -43,7 +44,7 @@ omarchy-recall skill
 omarchy-recall skill install
 ```
 
-It installs to the shared agents skill directory and links Claude Code when available. Search covers only the folders you select. Audio results identify matching intervals; they do not provide word-level transcripts. Initial binaries use CPU inference.
+It installs to the shared agents skill directory and links Claude Code when available. Search covers only the folders you select. Audio results identify matching intervals; they do not provide word-level transcripts. Vulkan GPU acceleration is included, with CPU fallback. Apple Silicon Linux uses Asahi’s Honeykrisp driver; the installer adds it on Apple machines. GPU indexing has been validated on an M1 Max. Short interactive queries stay on CPU to avoid GPU startup latency.
 
 ## Open source
 
