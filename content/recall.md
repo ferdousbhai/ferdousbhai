@@ -30,22 +30,22 @@ Arrow keys select a result. Enter opens it at its matching page, line or media i
 The CLI returns structured JSON without opening a window. Agents can search documents, images, audio/video and code, then read the matching indexed passage.
 
 ```bash
-omarchy-recall search "payment error" --kind screenshot --limit 5
-omarchy-recall search "retry with exponential backoff" --code
-omarchy-recall text 123 --code
-omarchy-recall status
-omarchy-recall doctor
+recall search "payment error" --kind screenshot --limit 5
+recall search "retry with exponential backoff" --code
+recall text 123 --code
+recall status
+recall doctor
 ```
 
 The skill is bundled with the CLI. Print it or install it for your coding agents:
 
 ```bash
-omarchy-recall skill
-omarchy-recall skill install
+recall skill
+recall skill install
 ```
 
 It installs to the shared agents skill directory and links Claude Code when available. Search covers only the folders you select. Audio results identify matching intervals; they do not provide word-level transcripts. Vulkan GPU acceleration is included, with CPU fallback. Apple Silicon Linux uses Asahi’s Honeykrisp driver; the installer adds it on Apple machines. GPU indexing has been validated on an M1 Max. Short interactive queries stay on CPU to avoid GPU startup latency.
 
 ## Open source
 
-[Source and releases](https://github.com/ferdousbhai/omarchy-recall). Based on [Recall by pdstn12](https://github.com/pdstn12/Recall), inspired by [DigUp by Abdur Rahim](https://github.com/ARahim3/DigUp). MIT licensed.
+[Source and releases](https://github.com/ferdousbhai/recall-for-omarchy). Based on [Recall by pdstn12](https://github.com/pdstn12/Recall), inspired by [DigUp by Abdur Rahim](https://github.com/ARahim3/DigUp). MIT licensed.
