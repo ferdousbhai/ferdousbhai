@@ -71,12 +71,6 @@ claude mcp add --scope user desktop -- ghost-desktop
 
 Included in Ghost. Standalone, it needs [Bun](https://bun.sh) and Omarchy. [Source and issues](https://github.com/ferdousbhai/ghost-desktop), Apache-2.0.
 
-## Ghost for Chrome {#chrome}
-
-An AI agent in your Chrome. It works in its own tabs, reading and filling in pages behind your logins while your tabs stay yours. Chat with it in the side panel on a free model through your OpenRouter account, or let your ghost drive it.
-
-[Install from the Chrome Web Store](https://chromewebstore.google.com/detail/ghost/hiikecmfleghkggknndabdkmlmnohpbm). [Source and issues](https://github.com/ferdousbhai/ghost-chromium-extension), Apache-2.0.
-
 ## Summon Ghost {#summon}
 
 Ghost as a web app: a managed Arch desktop with a ghost running it, no machine of your own needed. Coming soon at [summonghost.com](https://summonghost.com).
