@@ -7,11 +7,10 @@ description: An orchestration layer for all your agent harnesses on Omarchy.
 
 Ghost is an orchestration layer for all your agent harnesses on [Omarchy](https://omarchy.org). It coordinates the agent CLIs you already use (Claude Code, Codex, Grok, OpenCode, pi), keeping each harness's own sign-ins, tools and limits. Give a ghost a character and a job; it uses those harnesses to work your apps, browser and files. Ghost and your files stay on your computer.
 
-Three parts, each usable alone:
+Two parts, each usable alone:
 
 - [Ghost](#app): the app.
 - [ghost-desktop](#desktop): computer use for any AI agent.
-- [Ghost for Chrome](#chrome): an AI agent in your Chrome.
 
 [Summon Ghost](#summon), a separate project, puts it all in a web app (coming soon).
 
