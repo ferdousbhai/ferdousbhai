@@ -9,7 +9,7 @@ const contentDir = repositoryRoot + "content/";
 const publicDir = repositoryRoot + "public/";
 const SITE_URL = "https://ferdousbhai.com";
 // The browser chrome and the page paint the same colour; keep it said once.
-const BG = "#1a1030";
+const BG = "#13111a";
 
 // content/index.md is the homepage; every other content/<slug>.md is a page
 // served at /<slug>, rendered from plain markdown.
@@ -171,22 +171,19 @@ const renderMarkdown = (source) => {
 
 // Comments and indentation stay here; the page gets the rules alone.
 const stylesheet = `
-/* Two levels of text: --ink for names and prose, --dim for everything
-   quieter. Both stay readable on the page and every colored panel. The quiet
-   level carries the small labels and the footer, all at the micro size on a
-   phone panel, so it is deliberately not faint. */
+/* One flat ink background, one raised surface for panels and code, one hairline.
+   Two levels of text: --ink for names and prose, --dim for everything quieter,
+   kept readable at the micro size. Color is spent sparingly: the sun in the
+   accent, and each project group's own hue on its label and its hovers. */
 :root {
   color-scheme: dark;
   --bg: ${BG};
-  --line: #5a4689;
-  --ink: #fff5fc;
-  --dim: #dacdee;
-  --accent: #ffd166;
-  --pink: #ff7ac6;
-  --cyan: #5ee7ff;
-  --violet: #a98bff;
-  /* The sunset that runs through the name and the titles. */
-  --rainbow: linear-gradient(90deg, var(--accent), #ff8a5c 25%, var(--pink) 50%, var(--violet) 75%, var(--cyan));
+  --surface: #1c1826;
+  --line: #2e2840;
+  --ink: #f2eef8;
+  --dim: #aea5c0;
+  --accent: #f4c26b;
+  --hue: var(--accent);
   --micro: 0.75rem;
   /* The reader's own monospace: no font request, nothing to swap in later. */
   --mono: ui-monospace, "JetBrains Mono", "Cascadia Mono", "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
@@ -202,29 +199,15 @@ body {
   color: var(--ink);
   font-family: var(--mono);
   font-size: 0.875rem;
-  line-height: 1.55;
+  line-height: 1.6;
 }
-/* Three soft glows and a dot grid over the plum, held still while the page
-   scrolls, so the colored panels sit on something with depth. A fixed layer of
-   its own is painted once, where a fixed body background repaints every frame. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(55rem 38rem at 8% -12%, color-mix(in srgb, var(--pink) 20%, transparent), transparent 62%),
-    radial-gradient(48rem 36rem at 108% 18%, color-mix(in srgb, var(--cyan) 14%, transparent), transparent 62%),
-    radial-gradient(52rem 34rem at 45% 118%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 62%),
-    radial-gradient(circle, rgb(255 255 255 / 0.07) 1px, transparent 1.5px) 0 0 / 22px 22px;
-}
-::selection { background: var(--pink); color: var(--bg); }
+::selection { background: var(--accent); color: var(--bg); }
 a { color: inherit; text-decoration: none; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
 .frame {
   flex: 1;
-  max-width: 68rem;
+  max-width: 64rem;
   display: flex;
   flex-direction: column;
 }
@@ -233,51 +216,40 @@ a { color: inherit; text-decoration: none; }
 .bar, .foot {
   display: flex;
   align-items: center;
-  padding-block: clamp(0.7rem, 2vh, 1.15rem);
+  padding-block: clamp(0.9rem, 2.4vh, 1.4rem);
 }
 /* Everything small on the site is the one micro size, and every label among
-   them, the bar, the group and section headings and an entry's tag, is set
-   the same way. */
+   them is set the same way. */
 .bar, .foot, .group__label, .doc h2, .work__tag { font-size: var(--micro); }
 .bar, .group__label, .doc h2, .work__tag {
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 .bar {
   justify-content: space-between;
   gap: 1rem;
 }
-/* The name is the sunset, after a small sun like the favicon's. */
+/* The name follows a small sun like the favicon's. */
 .bar__name {
   margin: 0;
   font-size: inherit;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 0.7em;
+  gap: 0.75em;
 }
 .bar__name::before {
   content: "";
   flex: none;
-  width: 0.85em;
-  height: 0.85em;
+  width: 0.7em;
+  height: 0.7em;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent), 0 0 16px 2px color-mix(in srgb, var(--accent) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
-.bar__name, .doc h1, .card h1 {
-  /* As wide as its text, so the whole sunset shows. */
-  width: fit-content;
-  background-image: var(--rainbow);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+a.bar__name:hover { color: var(--accent); }
 .bar__page {
-  color: var(--bg);
-  background: var(--cyan);
-  padding: 0.1rem 0.6rem;
-  font-weight: 700;
+  color: var(--dim);
   text-align: right;
 }
 
@@ -285,35 +257,37 @@ a { color: inherit; text-decoration: none; }
   flex: 1;
   display: grid;
   align-content: center;
-  row-gap: clamp(1rem, 2.2vh, 1.5rem);
-  padding-block: clamp(0.7rem, 1.6vh, 1.2rem);
+  row-gap: clamp(0.9rem, 2vh, 1.25rem);
+  padding-block: clamp(0.5rem, 1.4vh, 1rem);
 }
 .stage:has(> .doc) { align-content: start; }
 
-/* Each collection is a candy-colored sticker: a two-tone panel with a hard
-   shadow in its own color, and its label a pill in the same color. */
+/* Each collection is a quiet panel; its hue shows only on the label's dot,
+   the tags, and a name on hover. */
 .group {
-  --panel: #0f4a3e;
-  --panel-2: #12364f;
-  --panel-line: #3fc7a0;
-  --panel-accent: #7cf5c8;
-  --lift: 6px;
-  background: linear-gradient(135deg, var(--panel), var(--panel-2));
-  border: 2px solid var(--panel-line);
-  border-radius: 16px;
-  box-shadow: var(--lift) var(--lift) 0 var(--panel-line);
-  padding: clamp(0.9rem, 1.9vh, 1.2rem) clamp(0.9rem, 2.5vw, 1.5rem);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: clamp(1rem, 2.2vh, 1.4rem) clamp(1rem, 2.6vw, 1.6rem);
 }
-.group:nth-child(4n + 2) { --panel: #222f72; --panel-2: #3a2168; --panel-line: #7d8cff; --panel-accent: #b3bcff; }
-.group:nth-child(4n + 3) { --panel: #5c1d50; --panel-2: #4a1a35; --panel-line: #f065ad; --panel-accent: #ffa3d6; }
-.group:nth-child(4n + 4) { --panel: #5a3212; --panel-2: #561f2b; --panel-line: #f08f3e; --panel-accent: #ffc27a; }
+.group:nth-child(4n + 1) { --hue: #7fdcb4; }
+.group:nth-child(4n + 2) { --hue: #9fb0ff; }
+.group:nth-child(4n + 3) { --hue: #ff9fcd; }
+.group:nth-child(4n + 4) { --hue: #ffbd7a; }
 .group__label {
-  display: inline-block;
-  margin: 0 0 0.9rem;
-  padding: 0.1rem 0.65rem;
-  background: var(--panel-accent);
-  color: var(--panel);
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin: 0 0 1rem;
+  color: var(--dim);
+  font-weight: 600;
+}
+.group__label::before {
+  content: "";
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: var(--hue);
 }
 
 /* Stacked, the entries would run past the fold on a laptop, so they pair up and
@@ -325,8 +299,7 @@ a { color: inherit; text-decoration: none; }
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: clamp(1.25rem, 3.5vw, 3rem);
-  /* Space separates the rows; a rule above each entry would only add clutter. */
-  row-gap: clamp(0.8rem, 2vh, 1.5rem);
+  row-gap: clamp(0.9rem, 2vh, 1.4rem);
 }
 .work__link { display: block; }
 /* An entry's name and a page's title are the two title sizes, set alike. */
@@ -334,67 +307,62 @@ a { color: inherit; text-decoration: none; }
   font-weight: 700;
   letter-spacing: -0.02em;
 }
-.work__name { font-size: clamp(0.9375rem, min(2.1vw, 2.6vh), 1.25rem); }
-/* Project names on hover and links on a page share one wavy underline. */
-.work__name, .doc a {
-  text-decoration: wavy 1px currentColor;
-  text-underline-offset: 0.3em;
-}
-/* On hover the name takes its panel's color, the underline and an arrow. */
+.work__name { font-size: clamp(0.9375rem, min(2vw, 2.5vh), 1.125rem); }
+/* On hover the name takes its group's hue and an arrow slides in. */
 .work__name::after {
   content: " →";
+  display: inline-block;
   opacity: 0;
+  transform: translateX(-0.3em);
 }
 .work__link:hover .work__name,
-.work__link:focus-visible .work__name {
-  color: var(--panel-accent);
-  text-decoration-line: underline;
-}
+.work__link:focus-visible .work__name { color: var(--hue); }
 .work__link:hover .work__name::after,
-.work__link:focus-visible .work__name::after { opacity: 1; }
+.work__link:focus-visible .work__name::after { opacity: 1; transform: none; }
 .work__tag {
-  margin-left: 0.4rem;
-  padding: 0 0.5rem;
-  border: 1px dashed var(--panel-accent);
-  color: var(--panel-accent);
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--hue) 45%, transparent);
+  border-radius: 999px;
+  color: var(--hue);
+  font-size: 0.6875rem;
+  vertical-align: 0.15em;
 }
 .work__blurb {
-  margin: 0.15rem 0 0;
+  margin: 0.2rem 0 0;
   color: var(--dim);
   max-width: 34rem;
 }
 
-/* A page: one column of prose in the same frame, its title in the sunset, its
-   section headings in pink after a little diamond, and every command in a box
-   with a pink edge. */
-.doc { max-width: 40rem; }
+/* A page: one column of prose in the same frame. */
+.doc { max-width: 40rem; padding-top: clamp(0.5rem, 2vh, 1.5rem); }
 .doc h1 {
-  margin: 0 0 0.75rem;
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  margin: 0 0 1rem;
+  font-size: clamp(1.375rem, 3.2vw, 1.875rem);
+  line-height: 1.2;
 }
 .doc h2 {
-  margin: 2rem 0 0.6rem;
-  color: var(--pink);
+  margin: 2.25rem 0 0.6rem;
+  color: var(--accent);
   font-weight: 700;
 }
-.doc h2::before { content: "◆ "; color: var(--accent); }
-.doc p, .doc ul { margin: 0 0 0.75rem; }
-.doc ul { padding-left: 1.2rem; }
-.doc li { margin-bottom: 0.25rem; }
-.doc li::marker { content: "✦ "; color: var(--cyan); }
+.doc p, .doc ul { margin: 0 0 0.85rem; }
+.doc ul { padding-left: 1.25rem; }
+.doc li { margin-bottom: 0.3rem; }
+.doc li::marker { content: "– "; color: var(--dim); }
 .doc a {
   color: var(--accent);
-  text-decoration-line: underline;
-  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  text-decoration: underline 1px color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 0.25em;
 }
-.doc a:hover { color: var(--pink); text-decoration-color: var(--pink); }
+.doc a:hover { text-decoration-color: var(--accent); }
 /* Inline code wraps mid-phrase, and a border would split with it; the shade
-   and the cyan alone mark it. */
+   alone marks it. */
 .doc code {
-  padding: 0.05em 0.35em;
+  padding: 0.1em 0.35em;
   border-radius: 4px;
-  background: color-mix(in srgb, var(--cyan) 12%, transparent);
-  color: #b9f4ff;
+  background: var(--surface);
+  color: var(--ink);
 }
 .doc pre, .doc img {
   border: 1px solid var(--line);
@@ -403,50 +371,33 @@ a { color: inherit; text-decoration: none; }
 /* A long command scrolls inside its box. Containment keeps the block's width
    out of its ancestors' minimum size, so nothing above it widens past a phone. */
 .doc pre {
-  margin: 0.6rem 0 0.9rem;
-  padding: 0.8rem 1rem;
-  background: rgb(10 5 20 / 0.55);
-  box-shadow: inset 4px 0 0 var(--pink), 4px 4px 0 color-mix(in srgb, var(--violet) 35%, transparent);
+  margin: 0.6rem 0 1rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
   overflow-x: auto;
   contain: inline-size;
 }
-.doc pre code { padding: 0; background: none; color: var(--ink); }
+.doc pre code { padding: 0; background: none; }
 .doc img {
   display: block;
   max-width: 100%;
   height: auto;
-  margin: 0.25rem 0 1rem;
-  box-shadow: 6px 6px 0 color-mix(in srgb, var(--pink) 40%, transparent);
+  margin: 0.4rem 0 1.1rem;
 }
 
-/* The small labels and the contacts are pills. */
-.bar__page, .group__label, .work__tag, .foot a { border-radius: 999px; }
-
-/* The contacts light up in the sunset's colors. */
 .foot {
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.5rem 1.5rem;
   letter-spacing: 0.03em;
-}
-.foot a {
-  padding: 0.25rem 0.8rem;
-  border: 1px solid var(--line);
-  background: rgb(255 255 255 / 0.04);
   color: var(--dim);
 }
-.foot a:hover { color: var(--bg); border-color: transparent; }
-.foot a:nth-child(3n + 1):hover { background: var(--accent); }
-.foot a:nth-child(3n + 2):hover { background: var(--pink); }
-.foot a:nth-child(3n + 3):hover { background: var(--cyan); }
+.foot a:hover { color: var(--accent); }
 
 /* Movement only for readers who have not asked for less of it. */
 @media (prefers-reduced-motion: no-preference) {
-  .group { transition: transform 0.2s ease; }
-  .group:hover { transform: translate(-2px, -2px); }
-  .work__name::after { transition: opacity 0.15s ease; }
-  .foot a { transition: background 0.15s ease, color 0.15s ease; }
-  .bar__name::before { animation: pulse 3s ease-in-out infinite alternate; }
-  @keyframes pulse { to { transform: scale(1.2); } }
+  .work__name, .work__name::after, .foot a, .bar__name, .doc a {
+    transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease, text-decoration-color 0.15s ease;
+  }
 }
 
 @media (max-width: 56rem) {
@@ -457,10 +408,8 @@ a { color: inherit; text-decoration: none; }
    it is on a desktop rather than shrinking to fit one screen. */
 @media (max-width: 40rem) {
   body { padding: 0.4rem; }
-  .group { --lift: 4px; }
-  .work { row-gap: clamp(0.75rem, 2.1vh, 1.2rem); }
   /* One contact per line: whole-line tap targets instead of a ragged wrap. */
-  .foot { flex-direction: column; align-items: stretch; gap: 0.45rem; }
+  .foot { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
 }
 `
   .replace(/\s*\/\*[\s\S]*?\*\//g, "")
