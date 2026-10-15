@@ -1,9 +1,9 @@
 ---
-title: Recall for Omarchy
+title: Recall
 description: Search your files by meaning, locally. A native Omarchy app with a CLI and bundled skill so agents can search too.
 ---
 
-# Recall for Omarchy
+# Recall
 
 Find files by what’s in them. Describe a scene in a photo, find a passage in a document, jump to a matching interval in a recording, or search source code by what it does.
 
