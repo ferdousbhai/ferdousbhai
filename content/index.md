@@ -21,7 +21,7 @@ summary: Personal site of Ferdous. Software projects: {projects}.
 
 - [CloudChef](https://cloudchef.build): A Cloudflare-native app builder.
 - [spicytrade](https://spicy.trade): An options-trading web app and MCP server, with tastytrade support.
-- [Purple](https://soundspurple.com): A Strudel music studio your agent plays over MCP.
+- [Purple](https://soundspurple.com): Make music with your AI agent in a Strudel live coding studio, connected through MCP.
 
 ### Chrome extensions
 
