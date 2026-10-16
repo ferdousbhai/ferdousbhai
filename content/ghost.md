@@ -34,10 +34,12 @@ omarchy-shell shell rescanPlugins
 omarchy plugin enable ferdousbhai.ghost
 ```
 
-If you installed from the old `[ghost]` repository, run the installer once to remove it. The installer now uses Omarchy's package repository and performs the setup above. Run it as yourself; it asks for sudo when needed.
+If you installed Ghost before Omarchy shipped it, remove the old `[ghost]` repository, or `omarchy update` fails on its missing `ghost.db`:
 
 ```sh
-curl -fsSL https://ferdousbhai.com/ghost/install.sh | bash
+sudo sed -i '\#^Include = /etc/pacman.d/ghost.conf$#d' /etc/pacman.conf
+sudo rm -f /etc/pacman.d/ghost.conf
+rm -f ~/.config/omarchy/hooks/pre-refresh-pacman.d/ghost
 ```
 
 Open Ghost from the app launcher, or from the terminal: `ghost new <name>` makes a ghost and `ghost use <name>` selects it. Sign in through each agent's own CLI. `ghost harnesses` lists the available agents; `ghost switch codex` moves the current conversation to another agent, history intact.
@@ -79,4 +81,3 @@ Ghost as a web app: a managed Arch desktop with a ghost running it, no machine o
 - [Getting started](https://github.com/ferdousbhai/ghost/blob/master/docs/getting-started.md)
 - [Source and issues](https://github.com/ferdousbhai/ghost), Apache-2.0
 - [Releases](https://github.com/ferdousbhai/ghost/releases)
-- [The install script](https://github.com/ferdousbhai/ghost/releases/latest/download/install.sh), to read before running
