@@ -574,13 +574,19 @@ if (process.argv.includes("--cards")) {
     writeFileSync(source, card.html.replace(' src="/', ` src="file://${publicDir}`));
     const { status, stderr } = spawnSync(process.env.CHROMIUM ?? "chromium", [
       "--headless",
+      `--user-data-dir=${workDir}chromium-profile`,
       "--disable-gpu",
       "--hide-scrollbars",
       "--force-device-scale-factor=1",
       `--window-size=${CARD.width},${CARD.height}`,
       `--screenshot=${cardDir}${card.file}`,
       `file://${source}`,
-    ]);
+    ], {
+      // A profile of its own, and none of the user's chromium-flags.conf (the launcher reads it
+      // from XDG_CONFIG_HOME): an open browser's profile or debugging port would stop this run.
+      env: { ...process.env, XDG_CONFIG_HOME: workDir },
+      timeout: 60_000,
+    });
     if (status !== 0) throw new Error(`Chromium could not draw ${card.file}:\n${stderr}`);
     console.log(`drew public/img/og/${card.file}`);
   }
