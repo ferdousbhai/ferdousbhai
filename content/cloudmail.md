@@ -1,11 +1,11 @@
 ---
 title: Cloudmail
-description: Email on your own domains, run entirely from your own Cloudflare account, with a Screener for new senders, a native Omarchy app and a CLI any agent can drive. Gmail, iCloud Mail and HEY fit in too.
+description: Email for people and organizations on their own domains, run from their own Cloudflare account, plus Gmail, iCloud Mail and HEY.
 ---
 
 # Cloudmail
 
-Email on your own domains, run entirely from your own [Cloudflare](https://www.cloudflare.com) account: no mail server to maintain, no one in between. Your Gmail, iCloud Mail and HEY accounts fit in the same app, or use Cloudmail for them alone, with no domain or Cloudflare account.
+Email for people and organizations on their own domains, run entirely from their own [Cloudflare](https://www.cloudflare.com) account: no mail server to maintain, no one in between. Gmail, iCloud Mail and HEY fit in the same app, with a Screener for new senders, a native Omarchy app and a CLI any agent can drive. Cloudmail works for those accounts alone too, with no domain or Cloudflare account.
 
 ![Cloudmail in the Tokyo Night theme: the sidebar, an inbox of four conversations, and an open receipt](/img/cloudmail-inbox.webp)
 
