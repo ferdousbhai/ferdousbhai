@@ -5,9 +5,7 @@ description: Search your files by meaning, locally. A native Omarchy app with a 
 
 # Recall
 
-Find files by what’s in them. Describe a scene in a photo, find a passage in a document, jump to a matching interval in a recording, or search source code by what it does.
-
-Recall comes with a native Omarchy search panel, a CLI, and a bundled skill so coding agents can use the same local search engine. Everything runs on your computer with EmbeddingGemma 2. Your files, OCR text and search index stay local.
+Find files by what's in them: a scene in a photo, a passage in a document, an interval in a recording, source code by what it does. A native Omarchy search panel, a CLI and a bundled agent skill share one local engine (EmbeddingGemma 2). Files, OCR text and the index stay on your computer, and only the folders you choose are indexed.
 
 ## Install
 
@@ -15,37 +13,33 @@ Recall comes with a native Omarchy search panel, a CLI, and a bundled skill so c
 curl -fsSL https://ferdousbhai.com/recall/install.sh | bash
 ```
 
-For Omarchy on Intel/AMD PCs (x86_64) and ARM64 machines (aarch64). The installer automatically selects the right build, downloads a checksum-verified release, installs dependencies through Omarchy, and sets up the desktop integration and agent skill. Embedding model files download once; initial indexing takes time. OCR uses Omarchy’s bundled Tesseract and English language data, with no separate Python environment.
-
-An Omarchy package repository submission is in progress. Use the installer above until the package reaches your configured channel.
+For Omarchy on x86_64 and aarch64. Downloads a checksum-verified release, installs dependencies through Omarchy, and sets up the desktop integration and agent skill. The model downloads once; first indexing takes a while. An Omarchy package is in review; until it ships, use the installer.
 
 ## On your desktop
 
-Press `Super+Ctrl+Shift+F`, or click the magnifying glass in the bar. Search for “a screenshot showing a payment error” or “notes about portfolio risk.” Use `code:` to search selected source repositories.
+`Super+Ctrl+Shift+F`, or the magnifying glass in the bar. Try "a screenshot showing a payment error"; prefix `code:` to search selected repositories. Enter opens a result at its page, line or interval; Ctrl+Enter reveals it in the file manager. Settings picks folders and exclusions; Pause stops background indexing.
 
-Arrow keys select a result. Enter opens it at its matching page, line or media interval; Ctrl+Enter reveals it in the file manager. Settings chooses folders and exclusions, and Pause stops background indexing.
+## For agents
 
-## For agents, too
-
-The CLI returns structured JSON without opening a window. Agents can search documents, images, audio/video and code, then read the matching indexed passage.
+The CLI answers in JSON without opening a window:
 
 ```bash
 recall search "payment error" --kind screenshot --limit 5
 recall search "retry with exponential backoff" --code
 recall text 123 --code
-recall status
 recall doctor
-```
-
-The skill is bundled with the CLI. Print it or install it for your coding agents:
-
-```bash
-recall skill
 recall skill install
 ```
 
-The CLI and background coordinator are native Rust; search and settings use the Omarchy QML panel. Python and GTK are not required at runtime. `recall ocr` reports available system OCR languages; additional Tesseract language packs can be installed through Omarchy. The bundled skill installs to the shared agents skill directory and links Claude Code when available. Search covers only the folders you select. Audio results identify matching intervals; they do not provide word-level transcripts. Vulkan GPU acceleration is included, with CPU fallback. Apple Silicon Linux uses Asahi’s Honeykrisp driver; the installer adds it on Apple machines. GPU indexing has been validated on an M1 Max. Short interactive queries stay on CPU to avoid GPU startup latency.
+`recall skill install` puts the skill in the shared agents directory and links it for Claude Code.
+
+## Details
+
+- Native Rust CLI and coordinator with a QML panel; no Python or GTK at runtime.
+- OCR uses Omarchy's Tesseract (English by default; add language packs through Omarchy, list them with `recall ocr`).
+- Audio results are matching intervals, not word-level transcripts.
+- Vulkan GPU indexing with CPU fallback; Apple Silicon uses Asahi's Honeykrisp driver, which the installer adds. Short queries run on CPU to skip GPU startup.
 
 ## Open source
 
-[Source and releases](https://github.com/ferdousbhai/recall-for-omarchy). Based on [Recall by pdstn12](https://github.com/pdstn12/Recall), inspired by [DigUp by Abdur Rahim](https://github.com/ARahim3/DigUp). MIT licensed.
+[Source and releases](https://github.com/ferdousbhai/recall-for-omarchy), MIT. Based on [Recall by pdstn12](https://github.com/pdstn12/Recall), inspired by [DigUp by Abdur Rahim](https://github.com/ARahim3/DigUp).

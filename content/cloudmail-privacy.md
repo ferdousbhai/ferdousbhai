@@ -5,7 +5,7 @@ description: Cloudmail runs on your computer and in your own Cloudflare account.
 
 # Cloudmail privacy policy
 
-Cloudmail is software you run yourself: a command-line tool and desktop app on your computer, and a mail service deployed to your own Cloudflare account. This page covers what data it handles and where it goes. Last updated 18 October 2026.
+Cloudmail is software you run yourself: a command-line tool and desktop app on your computer, and a mail service deployed to your own Cloudflare account. Last updated 18 October 2026.
 
 ## The short version
 
