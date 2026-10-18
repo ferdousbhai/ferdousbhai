@@ -12,49 +12,17 @@ Two parts, each usable alone:
 - [Ghost](#app): the app.
 - [ghost-desktop](#desktop): computer use for any AI agent.
 
-[Summon Ghost](#summon), a separate project, puts it all in a web app (coming soon).
-
 ## Install Ghost {#app}
 
 Give your ghost a job: tidy a folder, fill in a form on a site you're signed into, check something every morning, or hand a coding task to your other agents and report back. It keeps going on long tasks and asks when a decision is yours. Each ghost has its own character and keeps its notes as plain files in your Documents.
 
-Ghost is available directly from Omarchy's package repository; `omarchy update` keeps it current.
+Ghost is available from Omarchy's package repository; `omarchy update` keeps it current.
 
 ```sh
 omarchy pkg add ghost
 ```
 
-Start the daemon and enable the desktop plugin in your login:
-
-```sh
-systemctl --user enable --now ghostd.service
-mkdir -p ~/.config/omarchy/plugins
-ln -sfnT /usr/share/ghost/plugin ~/.config/omarchy/plugins/ferdousbhai.ghost
-omarchy-shell shell rescanPlugins
-omarchy plugin enable ferdousbhai.ghost
-```
-
-If you installed Ghost before Omarchy shipped it, remove the old `[ghost]` repository, or `omarchy update` fails on its missing `ghost.db`:
-
-```sh
-sudo sed -i '\#^Include = /etc/pacman.d/ghost.conf$#d' /etc/pacman.conf
-sudo rm -f /etc/pacman.d/ghost.conf
-rm -f ~/.config/omarchy/hooks/pre-refresh-pacman.d/ghost
-```
-
-Open Ghost from the app launcher, or from the terminal: `ghost new <name>` makes a ghost and `ghost use <name>` selects it. Sign in through each agent's own CLI. `ghost harnesses` lists the available agents; `ghost switch codex` moves the current conversation to another agent, history intact.
-
-For a Super + Ctrl + G shortcut, copy `ghost.lua` or `ghost.conf` from `/usr/share/doc/ghost/shell-contrib/hyprland/` into your Hyprland config; Ghost never edits it.
-
-## From the terminal
-
-`ghost` does everything the app does:
-
-```sh
-ghost say "What should I focus on today?"
-ghost sessions
-ghost show -s cli-abc
-```
+Then follow [Getting started](https://github.com/ferdousbhai/ghost/blob/master/docs/getting-started.md) to turn it on for your login.
 
 ## Requirements
 
@@ -71,10 +39,6 @@ claude mcp add --scope user desktop -- ghost-desktop
 ```
 
 Included in Ghost. Standalone, it needs [Bun](https://bun.sh) and Omarchy. [Source and issues](https://github.com/ferdousbhai/ghost-desktop), Apache-2.0.
-
-## Summon Ghost {#summon}
-
-Ghost as a web app: a managed Arch desktop with a ghost running it, no machine of your own needed. Coming soon at [summonghost.com](https://summonghost.com).
 
 ## Links
 
