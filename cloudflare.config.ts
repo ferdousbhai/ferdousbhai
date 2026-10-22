@@ -4,6 +4,8 @@ export default defineConfig({
 	worker: {
 		name: "ferdousbhai-com",
 		compatibilityDate: "2025-12-23",
-		previewUrls: true,
+		previewUrls: false,
+		domains: ["ferdousbhai.com", "www.ferdousbhai.com"],
+		workersDev: false,
 	},
 });

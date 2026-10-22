@@ -628,7 +628,14 @@ const routeHeaders = routes
   .join("\n\n");
 
 const generatedFiles = {
-  "_headers": `${routeHeaders}
+  "_headers": `/*
+  Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Strict-Transport-Security: max-age=31536000
+
+${routeHeaders}
 
 /favicon.svg
   Cache-Control: public, max-age=604800
