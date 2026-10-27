@@ -77,12 +77,51 @@ for (const [key, value] of Object.entries(meta)) {
 const HTML_ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
 const escapeHtml = (value) => value.replace(/[&<>"]/g, (character) => HTML_ESCAPES[character]);
 
+// An image is written with its size so the text below it stays put while it
+// arrives. Only the formats the site keeps are read: PNG, the lossless WebP a
+// screenshot shrinks to at no cost to the pixels, and the lossy WebP of a
+// clip's poster.
+const imageSize = (src) => {
+  const bytes = readFileSync(publicDir + src.slice(1));
+  if (bytes.toString("latin1", 1, 4) === "PNG") return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+  if (bytes.toString("latin1", 12, 16) === "VP8L") {
+    const bits = bytes.readUInt32LE(21);
+    return { width: (bits & 0x3fff) + 1, height: ((bits >>> 14) & 0x3fff) + 1 };
+  }
+  if (bytes.toString("latin1", 12, 16) === "VP8 ") {
+    return { width: bytes.readUInt16LE(26) & 0x3fff, height: bytes.readUInt16LE(28) & 0x3fff };
+  }
+  throw new Error(`${src} is not a PNG or a WebP`);
+};
+
+// A project's picture is found by its name: public/img/work/<slug>.webp, and
+// beside it <slug>.mp4 when the project has a clip (drawn from motion/<slug>.html
+// by `pnpm motion`). The clip loops silently; the picture is its poster, and
+// stands in for it for readers who ask for less motion.
+const slugOf = (label) => label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const mediaHtml = (label) => {
+  const base = `/img/work/${slugOf(label)}`;
+  const hasClip = existsSync(`${publicDir}${base.slice(1)}.mp4`);
+  if (!existsSync(`${publicDir}${base.slice(1)}.webp`)) {
+    if (hasClip) throw new Error(`${base}.mp4 has no poster: add ${base}.webp`);
+    return "";
+  }
+  const { width, height } = imageSize(`${base}.webp`);
+  const size = `width="${width}" height="${height}"`;
+  const clip = hasClip
+    ? `<video src="${base}.mp4" poster="${base}.webp" ${size} autoplay muted loop playsinline aria-hidden="true"></video>`
+    : "";
+  return `\n          <span class="work__media${hasClip ? " work__media--clip" : ""}">${clip}<img src="${base}.webp" alt="" ${size} loading="lazy"></span>`;
+};
+
 const projectHtml = ({ label, url, blurb, tag }) => {
-  const blurbHtml = blurb ? `\n          <p class="work__blurb">${escapeHtml(blurb)}</p>` : "";
+  const blurbHtml = blurb ? `\n            <span class="work__blurb">${escapeHtml(blurb)}</span>` : "";
   const tagHtml = tag ? ` <span class="work__tag">${escapeHtml(tag)}</span>` : "";
   return `      <li>
-        <a class="work__link" href="${escapeHtml(url)}">
-          <span class="work__name">${escapeHtml(label)}</span>${tagHtml}${blurbHtml}
+        <a class="work__link" href="${escapeHtml(url)}">${mediaHtml(label)}
+          <span class="work__text">
+            <span class="work__name">${escapeHtml(label)}</span>${tagHtml}${blurbHtml}
+          </span>
         </a>
       </li>`;
 };
@@ -119,19 +158,6 @@ const inlineHtml = (text) =>
   escapeHtml(text)
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(INLINE_LINK, '<a href="$2">$1</a>');
-
-// An image is written with its size so the text below it stays put while it
-// arrives. Only the two formats the site keeps are read: PNG, and the lossless
-// WebP a screenshot shrinks to at no cost to the pixels.
-const imageSize = (src) => {
-  const bytes = readFileSync(publicDir + src.slice(1));
-  if (bytes.toString("latin1", 1, 4) === "PNG") return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
-  if (bytes.toString("latin1", 12, 16) === "VP8L") {
-    const bits = bytes.readUInt32LE(21);
-    return { width: (bits & 0x3fff) + 1, height: ((bits >>> 14) & 0x3fff) + 1 };
-  }
-  throw new Error(`${src} is not a PNG or a lossless WebP`);
-};
 
 // The subset of markdown the pages use: headings, paragraphs, bullet lists,
 // fenced code, an image on its own line, and inline code and links. Blocks are
@@ -281,32 +307,52 @@ a.bar__name:hover { color: var(--accent); }
   letter-spacing: -0.025em;
 }
 
-/* Each group is a quiet panel: a shade, no border. */
-.group {
-  background: var(--surface);
-  border-radius: 16px;
-  padding: 24px;
-}
+/* A group is its label over a gallery of cards, two to a row. */
+.group + .group { margin-top: 32px; }
 .group__label {
-  margin: 0 0 24px;
+  margin: 0 0 12px;
   color: var(--dim);
   font-size: 0.875rem;
   line-height: 1.25rem;
   font-weight: 500;
 }
-
-/* Stacked, the entries would run long on a laptop, so they pair up and the
-   list is half as many rows deep. */
 .work {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px 48px;
+  gap: 16px;
 }
-.work__link { display: block; }
-.work__link:active { transform: translateY(1px); }
+/* Each card is a shade, no border, with its picture or clip inset 8px; the
+   picture's corners are the card's less that gap. */
+.work__link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 8px 8px 24px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+.work__link:hover { background: var(--line); }
+.work__link:active { transform: scale(0.99); }
+.work__media {
+  display: block;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+}
+.work__media video, .work__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.work__media--clip img { display: none; }
+.work__text {
+  display: block;
+  padding: 0 12px;
+}
 .work__name {
   font-size: 1.125rem;
   line-height: 1.75rem;
@@ -338,9 +384,10 @@ a.bar__name:hover { color: var(--accent); }
   vertical-align: 2px;
 }
 .work__blurb {
-  margin: 4px 0 0;
+  display: block;
+  margin-top: 4px;
   color: var(--dim);
-  max-width: 34rem;
+  text-wrap: pretty;
 }
 
 /* A page: one column of prose in the same frame. */
@@ -412,14 +459,18 @@ a.bar__name:hover { color: var(--accent); }
 /* Movement only for readers who have not asked for less of it. */
 @media (prefers-reduced-motion: no-preference) {
   .work__link, .work__name, .work__name::after, .foot a, .bar__name, .doc a {
-    transition: color 300ms var(--ease), opacity 300ms var(--ease), transform 300ms var(--ease), text-decoration-color 300ms var(--ease);
+    transition: color 300ms var(--ease), background-color 300ms var(--ease), opacity 300ms var(--ease), transform 300ms var(--ease), text-decoration-color 300ms var(--ease);
   }
+}
+/* For readers who ask for less motion, the clip gives way to its still. */
+@media (prefers-reduced-motion: reduce) {
+  .work__media--clip video { display: none; }
+  .work__media--clip img { display: block; }
 }
 
 @media (min-width: 40rem) {
   body { padding: 16px; }
   .bar, .stage, .foot { padding-inline: 40px; }
-  .group { padding: 32px; }
   .headline { font-size: 3rem; line-height: 1; }
   .doc h1 { font-size: 2.25rem; line-height: 2.5rem; }
 }

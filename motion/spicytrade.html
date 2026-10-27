@@ -1,0 +1,194 @@
+<!doctype html>
+<!-- spicytrade: on the Watch view a ticker's implied volatility climbs live, the
+     option premium meter tips from Fair to Rich, and when an agent asks over
+     MCP what is rich today, the answer is a put spread to sell. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; background: #0a0a0b; font-family: "Geist", sans-serif; color: #f2f2f2; font-variant-numeric: tabular-nums; }
+.top { position: absolute; left: 0; top: 0; width: 1280px; height: 92px; border-bottom: 1px solid #1f1f22; }
+.logo { position: absolute; left: 40px; top: 24px; display: flex; align-items: center; gap: 10px; font-size: 38px; font-weight: 700; letter-spacing: -0.04em; }
+.logo svg { width: 42px; height: 44px; }
+.logo b { color: #ef3340; font-weight: 700; }
+.nav { position: absolute; left: 470px; top: 20px; height: 52px; padding: 5px; border-radius: 12px; background: #17171a; display: flex; gap: 4px; font-size: 24px; color: #a1a1a6; }
+.nav span { padding: 0 18px; display: flex; align-items: center; border-radius: 8px; }
+.nav .on { background: #2a2a2e; color: #fff; }
+.live { position: absolute; right: 44px; top: 30px; display: flex; align-items: center; gap: 10px; font-size: 26px; color: #7ee08a; }
+.live i { width: 14px; height: 14px; border-radius: 50%; background: #ef4f5f; }
+.sym { position: absolute; left: 48px; top: 124px; }
+.sym h1 { margin: 0; font-size: 64px; line-height: 1; font-weight: 700; letter-spacing: -0.03em; }
+.sym .name { margin-top: 8px; font-size: 26px; color: #8c8c92; }
+.sym .px { margin-top: 18px; font-size: 60px; font-weight: 700; letter-spacing: -0.03em; }
+.sym .px small { margin-left: 14px; font-size: 30px; font-weight: 500; }
+.meter { position: absolute; left: 48px; top: 372px; width: 524px; }
+.meter .head { display: flex; justify-content: flex-end; align-items: baseline; gap: 16px; font-size: 26px; color: #a1a1a6; }
+.meter .head b { display: inline-block; transform-origin: right center; font-size: 38px; font-weight: 700; min-width: 92px; text-align: right; }
+.meter .rail { position: relative; margin-top: 14px; height: 10px; border-radius: 5px; background: linear-gradient(90deg, #c7e86a, #f4d35e 50%, #f06a50 85%, #e8323f); }
+.meter .needle { position: absolute; top: -8px; left: 0; width: 26px; height: 26px; margin-left: -13px; }
+.meter .ticks { display: flex; justify-content: space-between; margin-top: 16px; font-size: 26px; color: #6e6e74; }
+.split { position: absolute; left: 616px; top: 124px; width: 1px; height: 360px; background: #232326; }
+.stats { position: absolute; left: 660px; top: 124px; display: grid; grid-template-columns: 200px 190px 180px; }
+.stats div { font-size: 26px; color: #8c8c92; }
+.stats strong { display: block; margin-top: 4px; font-size: 46px; font-weight: 600; color: #f2f2f2; letter-spacing: -0.02em; }
+.chart { position: absolute; left: 660px; top: 262px; width: 572px; height: 222px; }
+.chart span { position: absolute; left: 0; top: 0; font-size: 26px; color: #6e6e74; }
+.chart svg { position: absolute; left: 0; top: 0; overflow: visible; }
+.ask { position: absolute; left: 48px; top: 524px; width: 524px; height: 232px; border-radius: 18px; background: #141416; border: 1px solid #26262a; padding: 24px 28px; }
+.ask .who { display: flex; align-items: center; gap: 10px; font-family: "Geist Mono", monospace; font-size: 24px; color: #8c8c92; }
+.ask .who i { width: 12px; height: 12px; border-radius: 50%; background: #f5a54a; }
+.ask .q { margin-top: 22px; font-size: 40px; font-weight: 600; letter-spacing: -0.02em; white-space: pre; }
+.ask .a { margin-top: 18px; font-size: 28px; color: #f5a54a; white-space: pre; }
+.caret { display: inline-block; width: 4px; height: 40px; margin-left: 3px; vertical-align: -6px; background: #f5a54a; }
+.rec { position: absolute; left: 616px; top: 524px; width: 616px; height: 232px; border-radius: 18px; background: #1a120d; border: 2px solid #f5a54a; padding: 22px 30px; }
+.rec small { font-size: 24px; font-weight: 600; letter-spacing: 0.08em; color: #f5a54a; text-transform: uppercase; }
+.rec h2 { margin: 4px 0 0; line-height: 1.15; font-size: 46px; font-weight: 700; letter-spacing: -0.03em; }
+.rec p { margin: 8px 0 0; line-height: 1.2; font-size: 28px; color: #c9c9ce; white-space: pre; }
+.rec p b { color: #7ee08a; font-weight: 600; }
+</style>
+<div class="stage" id="stage">
+  <div class="top">
+    <div class="logo" id="logo">
+      <svg viewBox="0 0 42 44"><path d="M13 12 C 5 18, 6 34, 22 40 C 30 43, 36 41, 38 38 C 26 38, 20 28, 24 14 C 21 10, 16 10, 13 12 Z" fill="#e8323f"/><path d="M15 13 C 17 7, 22 5, 26 4 M20 12 C 23 10, 26 11, 26 14" stroke="#2f6b2a" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+      <span>spicy<b>trade</b></span>
+    </div>
+    <div class="nav" id="nav"><span class="on">Watch</span><span>Recommendations</span><span>Connect</span></div>
+    <div class="live" id="live"><i id="dot"></i>Live</div>
+  </div>
+  <div class="sym">
+    <h1 id="ticker">KITE</h1>
+    <div class="name" id="name">Kite Aerospace Corp.</div>
+    <div class="px" id="pxRow"><span id="px"></span><small id="chg"></small></div>
+  </div>
+  <div class="meter" id="meter">
+    <div class="head">Option premium <b id="verdict"></b></div>
+    <div class="rail"><svg class="needle" id="needle" viewBox="0 0 26 26"><path d="M13 2 L24 13 L13 24 L2 13 Z" fill="#fff" stroke="#0a0a0b" stroke-width="3"/></svg></div>
+    <div class="ticks"><span>Cheap</span><span>Fair</span><span>Rich</span></div>
+  </div>
+  <div class="split" id="split"></div>
+  <div class="stats" id="stats">
+    <div>IV<strong id="iv"></strong></div>
+    <div>Rank<strong id="rank"></strong></div>
+    <div>5d<strong id="five"></strong></div>
+  </div>
+  <div class="chart" id="chart">
+    <span>IV · 40 days</span>
+    <svg width="572" height="222" viewBox="0 0 572 222">
+      <path id="area" fill="url(#fill)"/>
+      <path id="line" fill="none" stroke="#f5a54a" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle id="ring" r="9" fill="none" stroke="#f5a54a" stroke-width="3"/>
+      <circle id="head" r="8" fill="#f5a54a"/>
+      <defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5a54a" stop-opacity="0.28"/><stop offset="1" stop-color="#f5a54a" stop-opacity="0"/></linearGradient></defs>
+    </svg>
+  </div>
+  <div class="ask" id="ask">
+    <div class="who"><i></i>agent · spicytrade MCP</div>
+    <div class="q" id="q"></div>
+    <div class="a" id="a">KITE. IV rank 88, premium Rich.</div>
+  </div>
+  <div class="rec" id="rec">
+    <small>Recommendation</small>
+    <h2>Sell a put spread</h2>
+    <p>KITE Dec 19  75 / 70 P  ·  30 DTE</p>
+    <p>Credit $1.85  ·  <b>71% POP</b></p>
+  </div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 13;
+window.POSTER = 9.6;
+
+const $ = (id) => document.getElementById(id);
+
+// Forty days of implied volatility: quiet for thirty, then a climb into the
+// last ten. The chart starts drawn to day thirty and draws the climb live.
+const N = 40, CALM = 29, TOP = 61.4;
+const IV = Array.from({ length: N }, (_, i) => 38 + 2.4 * Math.sin(i * 1.3) + 1.4 * Math.sin(i * 0.7 + 1));
+const BASE = IV[CALM];
+for (let i = CALM + 1; i < N; i++) {
+  const k = (i - CALM) / (N - 1 - CALM);
+  IV[i] = BASE + (TOP - BASE) * easeInOut(k) + 1.6 * Math.sin(k * Math.PI * 3) * Math.sin(k * Math.PI);
+}
+const W = 572, H = 222, Y0 = 52;
+const X = (i) => (i / (N - 1)) * (W - 12) + 6;
+const Y = (v) => Y0 + (1 - (v - 33) / (64 - 33)) * (H - Y0 - 10);
+const CLIMB = [2.2, 5.6];
+
+// The index the chart is drawn to at time t, and the IV there.
+const reach = (t) => CALM + (N - 1 - CALM) * clamp((t - CLIMB[0]) / (CLIMB[1] - CLIMB[0]));
+const ivAt = (r) => { const i = Math.min(N - 2, Math.floor(r)); return IV[i] + (IV[i + 1] - IV[i]) * (r - i); };
+
+// The quote ticks every half second by small fixed steps.
+const STEPS = [0.06, -0.03, 0.11, 0.04, -0.08, 0.13, 0.05, -0.02, 0.09, -0.06, 0.07, 0.03, -0.04, 0.08, -0.05, 0.02, 0.06, -0.03, 0.04, -0.07, 0.05, 0.01, -0.02, 0.03];
+// The needle's place on the rail, and the moment it crosses into Rich.
+const needle = (k) => 0.47 + 0.4 * k;
+const level = (t) => clamp((ivAt(reach(t)) - BASE) / (TOP - BASE));
+let FLIP_AT = CLIMB[1];
+for (let s = CLIMB[0]; s <= CLIMB[1]; s += 1 / 120) if (needle(level(s)) > 0.72) { FLIP_AT = s; break; }
+
+const QUESTION = "What's rich today?";
+const ASK_AT = 6.9, Q_STEP = 0.055;
+const ANSWER = ASK_AT + QUESTION.length * Q_STEP + 0.5;
+
+window.render = (t) => {
+  cycleFade($("stage"), t, CYCLE, 0.6);
+
+  // Build in, in reading order.
+  [["logo", 0.15], ["nav", 0.25], ["live", 0.3], ["ticker", 0.45], ["name", 0.52], ["pxRow", 0.6], ["meter", 0.85], ["stats", 0.7], ["chart", 0.95]]
+    .forEach(([id, at]) => appear($(id), progress(t, at, 0.7)));
+  $("split").style.opacity = progress(t, 0.6, 0.7);
+  const pulse = (t % 2) / 2;
+  $("dot").style.boxShadow = `0 0 0 ${pulse * 10}px rgba(239,79,95,${0.5 * (1 - pulse)})`;
+
+  // Live quote.
+  const ticks = Math.max(0, Math.floor((t - 1.6) / 0.5) + 1);
+  const px = 84.12 + STEPS.slice(0, ticks).reduce((a, b) => a + b, 0);
+  const chg = ((px - 83.1) / 83.1) * 100;
+  const last = ticks > 0 ? STEPS[ticks - 1] : 0;
+  const flash = ticks > 0 ? 1 - progress(t, 1.6 + (ticks - 1) * 0.5, 0.4) : 0;
+  $("px").textContent = `$${px.toFixed(2)}`;
+  $("px").style.color = flash > 0.05 ? (last > 0 ? "#7ee08a" : "#ff7a7a") : "#f2f2f2";
+  $("chg").textContent = `+${chg.toFixed(1)}%`;
+  $("chg").style.color = "#7ee08a";
+
+  // IV climbs; the chart draws to it, and rank, 5d and the meter follow.
+  const r = reach(t);
+  const iv = ivAt(r);
+  const k = clamp((iv - BASE) / (TOP - BASE));
+  const rank = 42 + 46 * k;
+  $("iv").textContent = `${iv.toFixed(1)}%`;
+  $("rank").textContent = rank.toFixed(0);
+  $("five").textContent = `+${(3.1 + 16.3 * k).toFixed(1)}`;
+  const pts = [];
+  for (let i = 0; i <= Math.floor(r); i++) pts.push([X(i), Y(IV[i])]);
+  const hx = X(r), hy = Y(iv);
+  pts.push([hx, hy]);
+  const d = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join("");
+  $("line").setAttribute("d", d);
+  $("area").setAttribute("d", `${d}L${hx.toFixed(1)} ${H}L${X(0)} ${H}Z`);
+  ["head", "ring"].forEach((id) => { $(id).setAttribute("cx", hx); $(id).setAttribute("cy", hy); });
+  const ring = ((t - 2.2) % 1.2 + 1.2) % 1.2 / 1.2;
+  $("ring").setAttribute("r", 8 + ring * 16);
+  $("ring").setAttribute("stroke-opacity", t > 2.2 ? 0.6 * (1 - ring) : 0);
+
+  $("needle").style.transform = `translateX(${needle(k) * 524}px)`;
+  const rich = t >= FLIP_AT;
+  $("verdict").textContent = rich ? "Rich" : "Fair";
+  $("verdict").style.color = rich ? "#f0604d" : "#f4d35e";
+  $("verdict").style.transform = `scale(${rich ? 1 + 0.3 * (1 - progress(t, FLIP_AT, 0.7)) : 1})`;
+
+  // An agent asks over MCP; the answer is the verdict and a trade.
+  appear($("ask"), progress(t, 6.4, 0.7), 24);
+  const q = typed(QUESTION, t, ASK_AT, Q_STEP);
+  const typing = t > ASK_AT - 0.2 && t < ANSWER - 0.2;
+  $("q").innerHTML = q + (typing && Math.floor(t * 2.4) % 2 === 0 ? '<span class="caret"></span>' : "");
+  appear($("a"), progress(t, ANSWER, 0.6));
+  const rec = progress(t, ANSWER + 0.35, 0.9);
+  appear($("rec"), rec, 24);
+  $("rec").style.transform += ` scale(${0.985 + 0.015 * rec})`;
+  $("rec").style.boxShadow = `0 0 ${40 * (1 - progress(t, ANSWER + 0.9, 1.2)) * rec}px rgba(245,165,74,0.45)`;
+};
+render(window.POSTER);
+</script>

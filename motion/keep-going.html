@@ -1,0 +1,100 @@
+<!doctype html>
+<!-- keep-going: an agent migrating nine tables tries to stop after four; the
+     hook sends it back, and lets it stop once all nine are done. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; background: #0b0c12; font-family: "Geist Mono", monospace; color: #c0caf5; }
+.window { position: absolute; left: 40px; top: 40px; width: 1200px; height: 720px; border-radius: 20px; background: #16171f; border: 1px solid #24263a; overflow: hidden; }
+.titlebar { height: 56px; display: flex; align-items: center; gap: 10px; padding: 0 24px; border-bottom: 1px solid #24263a; color: #565f89; font-size: 20px; }
+.titlebar i { width: 14px; height: 14px; border-radius: 50%; background: #2c2e42; }
+.titlebar span { margin-left: 14px; }
+.prompt { position: absolute; left: 56px; top: 92px; font-size: 32px; white-space: pre; }
+.prompt b { color: #7aa2f7; font-weight: 500; }
+.caret { display: inline-block; width: 16px; height: 34px; margin-left: 2px; vertical-align: -6px; background: #c0caf5; }
+.grid { position: absolute; left: 56px; top: 168px; display: grid; grid-template-columns: repeat(3, 352px); gap: 16px; }
+.chip { position: relative; height: 72px; border-radius: 12px; border: 2px dashed #2a2c3f; display: flex; align-items: center; gap: 14px; padding: 0 22px; font-size: 28px; color: #565f89; overflow: hidden; }
+.chip .fill { position: absolute; inset: 0; background: #1d2433; transform-origin: left; }
+.chip .mark { position: relative; width: 28px; text-align: center; }
+.chip .name { position: relative; }
+.say { position: absolute; left: 56px; top: 452px; font-size: 32px; white-space: pre; }
+.say b { color: #bb9af7; font-weight: 600; }
+.stamp { position: absolute; left: 56px; top: 520px; width: 1088px; height: 168px; border-radius: 16px; padding: 22px 32px; }
+.stamp small { display: block; font-size: 22px; letter-spacing: 0.02em; opacity: 0.8; }
+.stamp strong { display: inline-block; margin-top: 6px; font-family: "Geist", sans-serif; font-size: 72px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+.stamp span { margin-left: 28px; font-size: 30px; }
+.go { background: #2a2216; border: 2px solid #e0af68; color: #e0af68; }
+.go span { color: #f0d6a8; }
+.stop { background: #1b2618; border: 2px solid #9ece6a; color: #9ece6a; }
+.stop span { color: #cfe8b4; }
+</style>
+<div class="stage" id="stage">
+  <div class="window">
+    <div class="titlebar"><i></i><i></i><i></i><span>agent · billing</span></div>
+    <div class="prompt" id="prompt"></div>
+    <div class="grid" id="grid"></div>
+    <div class="say" id="say1"><b>agent</b>  Four of nine done. I'll stop here.</div>
+    <div class="stamp go" id="go"><small>keep-going</small><strong>CONTINUE</strong><span>Five tables left. Keep going.</span></div>
+    <div class="say" id="say2"><b>agent</b>  All nine migrated. Tests pass.</div>
+    <div class="stamp stop" id="stop"><small>keep-going</small><strong>STOP</strong><span>The job is done. The turn ends.</span></div>
+  </div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 12;
+window.POSTER = 5.6;
+
+const TABLES = ["invoices", "payments", "refunds", "credits", "coupons", "taxes", "plans", "usage", "ledger"];
+const COMMAND = 'agent "migrate the billing tables"';
+const grid = document.getElementById("grid");
+const chips = TABLES.map((name) => {
+  const chip = document.createElement("div");
+  chip.className = "chip";
+  chip.innerHTML = `<div class="fill"></div><span class="mark"></span><span class="name">${name}</span>`;
+  grid.append(chip);
+  return chip;
+});
+const $ = (id) => document.getElementById(id);
+
+// When each table starts migrating: the first four before the stop, the rest
+// after the hook sends the agent back.
+const START = TABLES.map((_, i) => (i < 4 ? 2.1 + i * 0.5 : 6.2 + (i - 4) * 0.5));
+const RUN = 0.42;
+
+window.render = (t) => {
+  cycleFade($("stage"), t, CYCLE);
+
+  const command = typed(COMMAND, t, 0.4, 0.04);
+  const typing = t < 0.4 + COMMAND.length * 0.04 + 0.3;
+  $("prompt").innerHTML = `<b>$</b> ${command}${typing && Math.floor(t * 2.4) % 2 === 0 ? '<span class="caret"></span>' : ""}`;
+
+  chips.forEach((chip, i) => {
+    appear(chip, progress(t, 1.8 + i * 0.04, 0.6));
+    const run = clamp((t - START[i]) / RUN);
+    const done = run >= 1;
+    chip.querySelector(".fill").style.transform = `scaleX(${easeInOut(run)})`;
+    chip.querySelector(".fill").style.background = done ? "#1b2618" : "#1d2433";
+    chip.style.borderStyle = run > 0 ? "solid" : "dashed";
+    chip.style.borderColor = done ? "#4f6b3a" : run > 0 ? "#7aa2f7" : "#2a2c3f";
+    chip.style.color = done ? "#9ece6a" : run > 0 ? "#c0caf5" : "#565f89";
+    chip.querySelector(".mark").textContent = done ? "✓" : run > 0 ? "›" : "·";
+  });
+
+  // First stop: the agent says it is stopping; the hook sends it back.
+  const leave1 = 1 - progress(t, 6.0, 0.4);
+  appear($("say1"), Math.min(progress(t, 4.25, 0.6), leave1));
+  const go = Math.min(progress(t, 4.85, 0.7), leave1);
+  appear($("go"), go, 0);
+  $("go").style.transform = `scale(${0.94 + 0.06 * go})`;
+
+  // Second stop: all done, and this time the turn ends.
+  appear($("say2"), progress(t, 8.75, 0.6));
+  const stop = progress(t, 9.35, 0.7);
+  appear($("stop"), stop, 0);
+  $("stop").style.transform = `scale(${0.94 + 0.06 * stop})`;
+};
+render(window.POSTER);
+</script>

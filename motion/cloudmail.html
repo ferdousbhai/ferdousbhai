@@ -1,0 +1,200 @@
+<!doctype html>
+<!-- cloudmail: new senders from linked Gmail, iCloud Mail and HEY wait in The
+     Screener; a forged message from your own domain fails DMARC and goes
+     straight to Blocked; y lets Maya in, n keeps a newsletter out. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; background: #0b0c12; font-family: "Geist Mono", monospace; color: #c0caf5; }
+.window { position: absolute; left: 40px; top: 40px; width: 1200px; height: 720px; border-radius: 20px; background: #1a1b26; border: 1px solid #24263a; overflow: hidden; }
+.side { position: absolute; left: 0; top: 0; bottom: 0; width: 350px; background: #13141c; border-right: 1px solid #24263a; padding: 30px 20px; }
+.logo { display: flex; align-items: center; gap: 12px; font-size: 28px; font-weight: 700; color: #7aa2f7; padding: 0 12px; }
+.logo svg { width: 30px; height: 24px; }
+.nav { margin-top: 34px; }
+.item { position: relative; display: flex; align-items: center; gap: 14px; height: 60px; padding: 0 14px; border-radius: 10px; font-size: 26px; white-space: nowrap; color: #a9b1d6; }
+.item.on { background: #24283b; color: #c0caf5; }
+.item svg { width: 26px; height: 26px; flex: none; }
+.item .n { margin-left: auto; min-width: 40px; height: 34px; padding: 0 10px; border-radius: 17px; background: #3b4261; color: #c0caf5; font-size: 22px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+.item.on .n { background: #7aa2f7; color: #13141c; }
+.linked { position: absolute; left: 34px; bottom: 34px; font-size: 22px; color: #565f89; }
+.linked div { display: flex; align-items: center; gap: 12px; margin-top: 12px; font-size: 24px; color: #a9b1d6; }
+.linked i { width: 14px; height: 14px; border-radius: 50%; }
+
+.main { position: absolute; left: 350px; top: 0; right: 0; bottom: 0; padding: 30px 36px; }
+.head { display: flex; align-items: center; gap: 14px; font-size: 32px; font-weight: 700; color: #c0caf5; }
+.head svg { width: 30px; height: 30px; }
+.sub { margin-top: 8px; font-size: 24px; color: #6b7394; }
+.empty { position: absolute; left: 36px; right: 36px; top: 300px; text-align: center; font-size: 28px; color: #565f89; }
+.list { position: absolute; left: 20px; right: 20px; top: 136px; height: 560px; }
+.row { position: absolute; left: 0; right: 0; top: 0; height: 126px; padding: 18px 20px; border-radius: 14px; border: 2px solid transparent; transform-origin: 0 50%; }
+.row .who { display: flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 700; color: #c0caf5; white-space: nowrap; }
+.row .src { padding: 3px 12px; border-radius: 8px; font-size: 22px; font-weight: 500; border: 2px solid; }
+.row .subj { margin-top: 12px; font-size: 27px; color: #a9b1d6; white-space: nowrap; }
+.row .tag { display: inline-block; margin-left: 14px; padding: 3px 12px; border-radius: 8px; font-size: 22px; font-weight: 600; background: #3a1d24; color: #f7768e; border: 2px solid #f7768e; }
+.row .btns { position: absolute; right: 20px; top: 38px; display: flex; gap: 12px; }
+.row .btns span { width: 86px; height: 50px; border-radius: 10px; border: 2px solid; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+.row .yes { color: #9ece6a; border-color: #9ece6a; }
+.row .no { color: #f7768e; border-color: #f7768e; }
+.key { position: absolute; width: 96px; height: 96px; border-radius: 18px; background: #c0caf5; color: #13141c; box-shadow: 0 8px 0 #565f89; display: flex; align-items: center; justify-content: center; font-size: 56px; font-weight: 700; }
+</style>
+<div class="stage" id="stage">
+  <div class="window">
+    <div class="side">
+      <div class="logo"><svg viewBox="0 0 30 24"><rect x="1" y="1" width="28" height="22" rx="3" fill="#7aa2f7"/><path d="M3 4l12 9 12-9" fill="none" stroke="#13141c" stroke-width="3"/></svg>cloudmail</div>
+      <div class="nav">
+        <div class="item on" id="navS"><svg viewBox="0 0 24 24"><path d="M2 3h20l-8 9v8l-4 2V12z" fill="currentColor"/></svg>The Screener<span class="n" id="nS"></span></div>
+        <div class="item" id="navI"><svg viewBox="0 0 24 24"><path d="M3 4h18v16H3z M3 13h5l2 3h4l2-3h5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg>Inbox<span class="n" id="nI"></span></div>
+        <div class="item" id="navB"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M5.6 5.6l12.8 12.8" stroke="currentColor" stroke-width="2.6"/></svg>Blocked<span class="n" id="nB"></span></div>
+      </div>
+      <div class="linked" id="linked">linked accounts
+        <div><i style="background:#f38b7a"></i>Gmail</div>
+        <div><i style="background:#7dcfff"></i>iCloud Mail</div>
+        <div><i style="background:#bb9af7"></i>HEY</div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="head" id="head"><svg viewBox="0 0 24 24"><path d="M2 3h20l-8 9v8l-4 2V12z" fill="currentColor"/></svg>The Screener</div>
+      <div class="sub" id="sub">New senders wait here. y lets them in, n blocks.</div>
+      <div class="empty" id="empty"></div>
+      <div class="list" id="list"></div>
+    </div>
+  </div>
+  <div class="key" id="key"></div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 13;
+window.POSTER = 4.7;
+
+const $ = (id) => document.getElementById(id);
+const SOURCES = { gmail: ["Gmail", "#f38b7a"], icloud: ["iCloud Mail", "#7dcfff"], hey: ["HEY", "#bb9af7"], own: ["rivera.example", "#9aa5ce"] };
+
+// Each message: when it lands, the decision (key, when) and where it goes.
+const MAIL = [
+  { who: "Maya Chen", src: "gmail", subj: "Dinner on Friday?", at: 1.2, key: "y", decide: 6.0, to: "navI" },
+  { who: "Growth Guru", src: "icloud", subj: "10x your audience in 7 days", at: 2.0, key: "n", decide: 7.7, to: "navB" },
+  { who: "Sam Okafor", src: "hey", subj: "Photos from Saturday", at: 2.8, key: "y", decide: 9.4, to: "navI" },
+  // Claims your own billing address but fails DMARC: forged, so it is
+  // blocked without asking.
+  { who: "billing@rivera.example", src: "own", subj: "Invoice overdue", at: 3.6, forged: 4.0, decide: 5.1, to: "navB" },
+];
+const ROW_H = 136;
+const PRESS = 0.35; // key down to the row leaving
+
+const list = $("list");
+const rows = MAIL.map((m) => {
+  const row = document.createElement("div");
+  row.className = "row";
+  const [name, color] = SOURCES[m.src];
+  row.innerHTML = `<div class="who">${m.who}<span class="src" style="color:${color};border-color:${color}55">${name}</span></div>`
+    + `<div class="subj">${m.subj}<span class="tag">DMARC fail · forged</span></div>`
+    + `<div class="btns"><span class="yes">Yes</span><span class="no">No</span></div>`;
+  if (!m.forged) row.querySelector(".tag").remove();
+  else row.querySelector(".btns").remove();
+  list.append(row);
+  return row;
+});
+
+// Where each row flies when it leaves: its nav item, in list coordinates.
+const target = (id) => {
+  const nav = $(id).getBoundingClientRect();
+  const box = list.getBoundingClientRect();
+  return [nav.left + 20 - box.left, nav.top + nav.height / 2 - box.top - 63];
+};
+
+const count = (base, t, events) => base + events.filter((e) => t >= e).length;
+
+window.render = (t) => {
+  cycleFade($("stage"), t, CYCLE);
+
+  // Presence: 0 before landing, 1 while listed, 0 once it has left.
+  const arrive = MAIL.map((m) => progress(t, m.at, 0.7));
+  const leave = MAIL.map((m) => progress(t, m.decide + (m.key ? PRESS : 0), 0.7, easeInOut));
+  const present = arrive.map((a, i) => a * (1 - leave[i]));
+
+  MAIL.forEach((m, i) => {
+    const row = rows[i];
+    // Newest on top: a row sits below every newer row still listed.
+    const slot = MAIL.reduce((sum, n, j) => sum + (n.at > m.at ? present[j] : 0), 0);
+    const out = leave[i];
+    const [tx, ty] = target(m.to);
+    const y = slot * ROW_H;
+    const fly = m.key === "n" ? 0 : out;
+    const x = tx * fly;
+    const yy = y + (ty - y) * fly;
+    const s = 1 - 0.7 * out;
+    row.style.transform = `translate(${x}px, ${yy - (1 - arrive[i]) * 30}px) scale(${s})`;
+    row.style.opacity = arrive[i] * (m.key === "n" ? 1 - out : 1 - clamp((out - 0.6) / 0.4));
+    row.style.filter = arrive[i] < 1 || out > 0 ? `blur(${Math.max(1 - arrive[i], m.key === "n" ? out : 0) * 6}px)` : "none";
+
+    // The row in focus, and the key that decides it.
+    const focus = m.key ? Math.min(progress(t, m.decide - 0.5, 0.4), 1 - out) : 0;
+    const flag = m.forged ? progress(t, m.forged, 0.5) : 0;
+    // A row on its way to a box is a solid card above the others.
+    const lift = out > 0 ? 1 : 0;
+    row.style.zIndex = lift ? 2 : 1;
+    row.style.background = flag ? `rgba(58, 29, 36, ${flag})` : `rgba(36, 40, 59, ${Math.max(focus, lift)})`;
+    row.style.borderColor = flag ? `rgba(247, 118, 142, ${flag})` : `rgba(122, 162, 247, ${Math.max(focus, lift)})`;
+    if (m.forged) {
+      const tag = row.querySelector(".tag");
+      tag.style.opacity = flag;
+      tag.style.transform = `scale(${0.85 + 0.15 * flag})`;
+    } else {
+      const pressed = t >= m.decide;
+      const yes = row.querySelector(".yes"), no = row.querySelector(".no");
+      yes.style.background = pressed && m.key === "y" ? "#9ece6a" : "transparent";
+      yes.style.color = pressed && m.key === "y" ? "#13141c" : "#9ece6a";
+      no.style.background = pressed && m.key === "n" ? "#f7768e" : "transparent";
+      no.style.color = pressed && m.key === "n" ? "#13141c" : "#f7768e";
+    }
+  });
+
+  // The keypress: a keycap pops beside the focused row.
+  const active = MAIL.find((m) => m.key && t >= m.decide - 0.3 && t < m.decide + 0.9);
+  const key = $("key");
+  if (active) {
+    const i = MAIL.indexOf(active);
+    const slot = MAIL.reduce((sum, n, j) => sum + (n.at > active.at ? present[j] : 0), 0);
+    const k = Math.min(progress(t, active.decide - 0.3, 0.3), 1 - progress(t, active.decide + 0.55, 0.35));
+    const down = t >= active.decide && t < active.decide + 0.15 ? 6 : 0;
+    key.textContent = active.key;
+    key.style.opacity = k;
+    key.style.left = "900px";
+    key.style.top = `${40 + 136 + slot * ROW_H + 15}px`;
+    key.style.transform = `translateY(${down + (1 - k) * 10}px) scale(${0.85 + 0.15 * k})`;
+    key.style.boxShadow = `0 ${8 - down}px 0 #565f89`;
+    key.style.background = active.key === "y" ? "#9ece6a" : "#f7768e";
+  } else {
+    key.style.opacity = 0;
+  }
+
+  // Counts change as rows arrive in their boxes.
+  const waiting = MAIL.filter((m, i) => m.key && t >= m.at && t < m.decide + PRESS + 0.35).length;
+  const inbox = count(3, t, MAIL.filter((m) => m.to === "navI").map((m) => m.decide + PRESS + 0.6));
+  const blocked = count(0, t, MAIL.filter((m) => m.to === "navB").map((m) => m.decide + (m.key ? PRESS : 0) + 0.6));
+  $("nS").textContent = waiting;
+  $("nS").style.opacity = waiting ? 1 : 0;
+  $("nI").textContent = inbox;
+  $("nB").textContent = blocked;
+  $("nB").style.opacity = blocked ? 1 : 0;
+  const bump = (id, events) => {
+    const k = Math.max(0, ...events.map((e) => (t >= e && t < e + 0.5 ? Math.sin(((t - e) / 0.5) * Math.PI) : 0)));
+    $(id).style.transform = `scale(${1 + 0.25 * k})`;
+    $(id).parentElement.style.boxShadow = k ? `inset 0 0 0 2px rgba(122, 162, 247, ${k})` : "none";
+  };
+  bump("nI", MAIL.filter((m) => m.to === "navI").map((m) => m.decide + PRESS + 0.6));
+  bump("nB", MAIL.filter((m) => m.to === "navB").map((m) => m.decide + (m.key ? PRESS : 0) + 0.6));
+
+  // Empty state before the first sender and after the last decision.
+  const emptyNow = t < 1.4 ? 1 - progress(t, 1.0, 0.3) : progress(t, 10.3, 0.5);
+  $("empty").textContent = t < 5 ? "No new senders" : "All screened";
+  appear($("empty"), Math.min(emptyNow, progress(t, 0.5, 0.6)));
+  appear($("head"), progress(t, 0.2, 0.6));
+  appear($("sub"), progress(t, 0.3, 0.6));
+  appear($("linked"), progress(t, 0.4, 0.6));
+};
+render(window.POSTER);
+</script>

@@ -1,0 +1,228 @@
+<!doctype html>
+<!-- omacloud: a file saved on the laptop is sealed, kept as ciphertext by
+     other Omarchy computers, and opens intact on the desktop; then a theme
+     change on the laptop follows the same way. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; background: #0b0c12; font-family: "Geist Mono", monospace; color: #c0caf5; }
+svg.links { position: absolute; inset: 0; }
+svg.links path { fill: none; stroke: #3b3f5c; stroke-width: 4; stroke-dasharray: 2 12; stroke-linecap: round; }
+
+/* Devices: a laptop on the left, a desktop on the right. */
+.device { position: absolute; top: 18px; width: 500px; }
+.device .bezel { position: relative; height: 296px; border-radius: 18px; background: #1c1d27; border: 2px solid #2c2e42; padding: 14px; }
+.screen { position: relative; height: 100%; border-radius: 6px; overflow: hidden; }
+.bar { height: 30px; display: flex; align-items: center; gap: 12px; padding: 0 14px; font-size: 18px; }
+.bar b { font-weight: 600; }
+.win { position: absolute; left: 14px; right: 14px; top: 42px; bottom: 14px; border-radius: 8px; border: 3px solid; padding: 14px 18px; }
+.win .name { font-size: 22px; opacity: 0.7; }
+.win .line { font-size: 30px; line-height: 1.45; white-space: pre; }
+.win .line.h { font-weight: 700; }
+.laptop { left: 40px; }
+.laptop .base { margin: 0 -26px; height: 22px; border-radius: 0 0 22px 22px; background: #2c2e42; }
+.desktop { left: 740px; }
+.desktop .neck { margin: 0 auto; width: 70px; height: 30px; background: #2c2e42; }
+.desktop .foot { margin: 0 auto; width: 200px; height: 12px; border-radius: 6px; background: #2c2e42; }
+.label { margin-bottom: 10px; text-align: center; font-size: 26px; color: #7f86ad; }
+
+/* The sealed copy that leaves the laptop. */
+.seal { position: absolute; left: 172px; top: 396px; width: 236px; height: 64px; border-radius: 12px; background: #1d2433; border: 2px solid #7aa2f7; display: flex; align-items: center; gap: 12px; padding: 0 16px; font-size: 24px; color: #c0caf5; white-space: pre; }
+.lock { width: 28px; height: 32px; flex: none; }
+
+/* Other people's Omarchy computers, keeping only ciphertext. */
+.node { position: absolute; top: 520px; width: 270px; height: 118px; border-radius: 16px; background: #14151d; border: 2px solid #2a2c3f; padding: 14px 18px; }
+.node small { display: block; font-size: 22px; color: #565f89; }
+.node .cipher { display: flex; align-items: center; gap: 12px; margin-top: 12px; font-size: 28px; color: #e0af68; white-space: pre; }
+.node .led { position: absolute; right: 16px; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: #2c2e42; }
+
+.packet { position: absolute; left: 0; top: 0; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 12px; background: #1d2433; border: 2px solid #7aa2f7; display: flex; align-items: center; justify-content: center; }
+.packet svg { width: 24px; height: 28px; }
+
+.caption { position: absolute; left: 0; right: 0; top: 686px; text-align: center; font-family: "Geist", sans-serif; font-size: 40px; font-weight: 600; letter-spacing: -0.01em; color: #e6e9f8; white-space: pre; }
+.caption span { color: #8b93b8; font-weight: 500; }
+.toast { position: absolute; right: 22px; top: 40px; padding: 8px 14px; border-radius: 8px; font-size: 22px; border: 2px solid; white-space: pre; }
+</style>
+<div class="stage" id="stage">
+  <svg class="links" viewBox="0 0 1280 800" id="links"></svg>
+
+  <div class="device laptop" id="laptop">
+    <div class="label">your laptop</div>
+    <div class="bezel"><div class="screen" id="scrA">
+      <div class="bar" id="barA"><b>1</b><span>2</span><span>3</span></div>
+      <div class="win" id="winA"><div class="name">trip-plan.md</div><div id="docA"></div></div>
+      <div class="toast" id="toast">theme  Gruvbox</div>
+    </div></div>
+    <div class="base"></div>
+  </div>
+
+  <div class="device desktop" id="desktop">
+    <div class="label">your desktop</div>
+    <div class="bezel"><div class="screen" id="scrB">
+      <div class="bar" id="barB"><b>1</b><span>2</span><span>3</span></div>
+      <div class="win" id="winB"><div class="name">trip-plan.md</div><div id="docB"></div></div>
+    </div></div>
+    <div class="neck"></div><div class="foot"></div>
+  </div>
+
+  <div class="seal" id="seal"></div>
+  <div id="nodes"></div>
+  <div id="packets"></div>
+  <div class="caption" id="caption"></div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 14;
+window.POSTER = 7.6;
+
+const $ = (id) => document.getElementById(id);
+const LOCK = (color) => `<svg class="lock" viewBox="0 0 28 32"><path d="M7 14V9a7 7 0 0 1 14 0v5" fill="none" stroke="${color}" stroke-width="3.5"/><rect x="2" y="14" width="24" height="17" rx="4" fill="${color}"/></svg>`;
+const GEAR = (color) => `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5" fill="none" stroke="${color}" stroke-width="4"/><path d="M12 1v5M12 18v5M1 12h5M18 12h5M4.2 4.2l3.5 3.5M16.3 16.3l3.5 3.5M4.2 19.8l3.5-3.5M16.3 7.7l3.5-3.5" stroke="${color}" stroke-width="3.5"/></svg>`;
+
+// Two Omarchy themes: the laptop switches from the first to the second.
+const THEMES = [
+  { bg: "#1a1b26", bar: "#16161e", fg: "#c0caf5", accent: "#7aa2f7", head: "#bb9af7" },
+  { bg: "#282828", bar: "#1d2021", fg: "#ebdbb2", accent: "#d79921", head: "#fe8019" },
+];
+const mix = (a, b, k) => {
+  const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const [x, y] = [p(a), p(b)];
+  return `rgb(${x.map((v, i) => Math.round(v + (y[i] - v) * k)).join(",")})`;
+};
+const theme = (screen, k) => {
+  const c = Object.fromEntries(Object.keys(THEMES[0]).map((key) => [key, mix(THEMES[0][key], THEMES[1][key], k)]));
+  $(`scr${screen}`).style.background = c.bg;
+  $(`bar${screen}`).style.background = c.bar;
+  $(`bar${screen}`).style.color = c.fg;
+  $(`win${screen}`).style.borderColor = c.accent;
+  $(`win${screen}`).style.color = c.fg;
+  return c;
+};
+
+const DOC = ["# Lisbon trip", "fly out May 3", "tram 28 at 9am"];
+const CIPHER = ["x7#Qa9", "kV2$e!", "9f&Lw0"];
+
+// Paths: laptop to each keeper, each keeper to the desktop.
+const NODE_X = [190, 505, 820];
+const links = $("links");
+const path = (d) => {
+  const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  p.setAttribute("d", d);
+  links.append(p);
+  return p;
+};
+const UP = NODE_X.map((x) => path(`M290 462 C 290 500, ${x + 135} 480, ${x + 135} 520`));
+const DOWN = NODE_X.map((x) => path(`M${x + 135} 520 C ${x + 135} 470, 990 470, 990 410`));
+const nodes = NODE_X.map((x, i) => {
+  const node = document.createElement("div");
+  node.className = "node";
+  node.style.left = `${x}px`;
+  node.innerHTML = `<i class="led"></i><small>an Omarchy PC</small><div class="cipher">${LOCK("#e0af68")}<span></span></div>`;
+  $("nodes").append(node);
+  return node;
+});
+const packets = [...Array(6)].map(() => {
+  const p = document.createElement("div");
+  p.className = "packet";
+  $("packets").append(p);
+  return p;
+});
+const at = (p, k) => {
+  const pt = p.getPointAtLength(p.getTotalLength() * k);
+  return `translate(${pt.x}px, ${pt.y}px)`;
+};
+
+const CAPTIONS = [
+  [1.2, "Save a file on your laptop"],
+  [3.3, "It's encrypted before it leaves"],
+  [4.4, "Other Omarchy computers keep it\n<span>They can't read it</span>"],
+  [6.8, "It opens on your desktop, intact"],
+  [8.6, "Change a setting"],
+  [10.3, "It follows to every computer"],
+];
+
+window.render = (t) => {
+  cycleFade($("stage"), t, CYCLE);
+
+  appear($("laptop"), progress(t, 0.15, 0.9), 16);
+  appear($("desktop"), progress(t, 0.3, 0.9), 16);
+  nodes.forEach((node, i) => appear(node, progress(t, 0.55 + i * 0.08, 0.9), 16));
+  links.style.opacity = progress(t, 0.8, 0.8);
+
+  // Themes: the laptop switches first, the desktop once the change arrives.
+  const lt = progress(t, 8.6, 0.7, easeInOut);
+  const dt = progress(t, 10.2, 0.7, easeInOut);
+  const ca = theme("A", lt);
+  const cb = theme("B", dt);
+
+  // The file is written on the laptop.
+  appear($("winA"), progress(t, 1.0, 0.6));
+  const step = 0.045;
+  let start = 1.4;
+  $("docA").innerHTML = DOC.map((line, i) => {
+    const shown = typed(line, t, start, step);
+    start += line.length * step + 0.12;
+    return `<div class="line${i === 0 ? " h" : ""}" style="color:${i === 0 ? ca.head : ca.fg}">${shown || "&nbsp;"}</div>`;
+  }).join("");
+
+  // A sealed copy drops out of the laptop, its name scrambling into ciphertext.
+  const sealIn = progress(t, 3.2, 0.6);
+  const sealOut = 1 - progress(t, 4.0, 0.3);
+  appear($("seal"), Math.min(sealIn, sealOut), -14);
+  const scramble = clamp((t - 3.5) / 0.4);
+  const name = "trip-plan.md";
+  const shown = name.split("").map((c, i) => (i < scramble * name.length ? "#$%&kQ9xVw7!"[i] : c)).join("");
+  $("seal").innerHTML = `${LOCK("#7aa2f7")}${shown}`;
+
+  // Sealed pieces travel to the keepers, then on to the desktop.
+  const kept = NODE_X.map((_, i) => progress(t, 4.95 + i * 0.12, 0.35));
+  packets.forEach((p, j) => {
+    const i = j % 3;
+    const settings = j >= 3;
+    // File pieces: up 4.1–5.0 to the keepers, down 5.6–6.6 to the desktop.
+    // Settings: one piece per keeper, 9.1–9.7 up, 9.7–10.3 down.
+    const [up, upFor, down, downFor] = settings ? [9.1 + i * 0.06, 0.6, 9.7 + i * 0.06, 0.6] : [4.1 + i * 0.12, 0.9, 5.6 + i * 0.1, 0.8];
+    const leg1 = clamp((t - up) / upFor);
+    const leg2 = clamp((t - down) / downFor);
+    const flying = (t >= up && leg1 < 1) || (t >= down && leg2 < 1);
+    p.style.opacity = flying ? 1 : 0;
+    p.style.transform = leg1 < 1 ? at(UP[i], easeInOut(leg1)) : at(DOWN[i], easeInOut(leg2));
+    const color = settings ? ca.accent : "#7aa2f7";
+    p.style.borderColor = color;
+    p.innerHTML = settings ? GEAR(color) : LOCK(color);
+  });
+
+  nodes.forEach((node, i) => {
+    const k = kept[i];
+    const blink = Math.max(k * (1 - progress(t, 5.2 + i * 0.12, 0.6)), progress(t, 9.55, 0.15) * (1 - progress(t, 9.75, 0.5)));
+    node.style.borderColor = mix("#2a2c3f", "#e0af68", blink);
+    node.querySelector(".led").style.background = k > 0 ? "#9ece6a" : "#2c2e42";
+    const cipher = node.querySelector(".cipher");
+    cipher.style.opacity = k;
+    cipher.querySelector("span").textContent = CIPHER[i];
+  });
+
+  // The file opens on the desktop exactly as written.
+  appear($("winB"), progress(t, 6.6, 0.6));
+  $("docB").innerHTML = DOC.map((line, i) => `<div class="line${i === 0 ? " h" : ""}" style="color:${i === 0 ? cb.head : cb.fg}">${line}</div>`).join("");
+
+  // The setting change shows on the laptop as a toast.
+  const toast = Math.min(progress(t, 8.4, 0.5), 1 - progress(t, 10.8, 0.4));
+  appear($("toast"), toast, -8);
+  $("toast").style.borderColor = ca.accent;
+  $("toast").style.background = ca.bar;
+  $("toast").style.color = ca.fg;
+
+  let caption = CAPTIONS.findIndex(([s], i) => t >= s && (i === CAPTIONS.length - 1 || t < CAPTIONS[i + 1][0]));
+  const el = $("caption");
+  if (caption < 0) { el.innerHTML = ""; return; }
+  const [s, text] = CAPTIONS[caption];
+  const next = CAPTIONS[caption + 1];
+  el.innerHTML = text;
+  appear(el, Math.min(progress(t, s, 0.5), next ? 1 - progress(t, next[0] - 0.25, 0.25) : 1));
+};
+render(window.POSTER);
+</script>

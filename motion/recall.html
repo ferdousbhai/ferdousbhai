@@ -1,0 +1,212 @@
+<!doctype html>
+<!-- recall: a plain-language question finds the clause that ends the Globex
+     contract early and marks it on page 2; a second question finds the
+     meeting recording and jumps to the moment hiring was frozen. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; font-family: "Geist", sans-serif; color: #e6e6ea; }
+.wall { position: absolute; inset: 0; }
+.panel { position: absolute; left: 60px; top: 40px; width: 1160px; border-radius: 18px; background: rgba(30, 30, 34, 0.99); border: 1px solid #3a3a42; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45); }
+.bar { position: absolute; left: 20px; top: 18px; right: 20px; height: 68px; border-radius: 12px; border: 2px solid #4a6fa5; background: #17171a; display: flex; align-items: center; padding: 0 22px; gap: 18px; }
+.bar svg { flex: none; }
+.query { font-size: 34px; white-space: pre; color: #f2f2f5; }
+.query .sel { background: #3d5a8c; }
+.caret { display: inline-block; width: 3px; height: 38px; margin-left: 2px; vertical-align: -7px; background: #f2f2f5; }
+.divider { position: absolute; left: 0; right: 0; top: 104px; height: 1px; background: #33333a; }
+.col { position: absolute; left: 400px; top: 104px; bottom: 0; width: 1px; background: #33333a; }
+.list { position: absolute; left: 20px; top: 126px; width: 362px; }
+.list small { display: block; font-size: 20px; letter-spacing: 0.12em; color: #8a8a96; font-weight: 600; margin: 0 0 14px 10px; }
+.row { display: flex; gap: 16px; align-items: center; padding: 14px 12px; border-radius: 12px; margin-bottom: 8px; }
+.row.on { background: #2e2e35; }
+.row .icon { flex: none; width: 40px; height: 50px; border-radius: 4px; background: #f1f1f3; position: relative; }
+.row .icon.audio { background: #3a3f5c; display: flex; align-items: center; justify-content: center; gap: 3px; }
+.row .icon.audio i { width: 4px; border-radius: 2px; background: #9db4ff; }
+.row b { display: block; font-size: 27px; font-weight: 600; white-space: nowrap; }
+.row span { display: block; font-size: 22px; color: #9a9aa6; white-space: nowrap; margin-top: 2px; }
+.row em { font-style: normal; font-size: 20px; color: #c8c8d0; background: #3c3c45; border-radius: 6px; padding: 1px 8px; margin-left: 8px; vertical-align: 3px; font-weight: 500; }
+.prev { position: absolute; left: 424px; top: 124px; width: 716px; }
+.paper { position: relative; height: 330px; border-radius: 12px; background: #2a2a30; overflow: hidden; }
+.sheet { position: absolute; left: 40px; right: 40px; top: 0; background: #fbfaf7; color: #2b2b30; padding: 34px 40px; border-radius: 4px; }
+.sheet h4 { margin: 0 0 14px; font-size: 26px; font-weight: 700; }
+.sheet .ln { height: 14px; border-radius: 7px; background: #d9d7d0; margin: 0 0 16px; }
+.sheet p { margin: 0 0 18px; font-size: 25px; line-height: 1.42; }
+.mark { background-image: linear-gradient(#f6c46a, #f6c46a); background-repeat: no-repeat; background-size: 0% 100%; border-radius: 3px; }
+.tag { position: absolute; right: 14px; bottom: 14px; font-size: 20px; padding: 4px 12px; border-radius: 8px; background: rgba(20, 20, 24, 0.85); color: #e6e6ea; font-weight: 500; }
+.title { margin-top: 20px; font-size: 29px; font-weight: 650; }
+.meta { margin-top: 10px; font-size: 24px; color: #a5a5b0; }
+.meta .star { color: #f6c46a; }
+.btns { margin-top: 22px; display: flex; gap: 14px; }
+.btn { font-size: 25px; font-weight: 600; padding: 12px 24px; border-radius: 10px; background: #3a3a42; }
+.btn.blue { background: #2f7bf0; color: #fff; }
+.wave { position: relative; height: 330px; border-radius: 12px; background: #24242a; overflow: hidden; }
+.bars { position: absolute; left: 34px; right: 34px; top: 40px; height: 130px; display: flex; align-items: center; gap: 3px; }
+.bars i { flex: 1; border-radius: 3px; background: #4a4a56; }
+.head { position: absolute; top: 26px; width: 4px; height: 158px; border-radius: 2px; background: #f6c46a; }
+.head b { position: absolute; top: -4px; left: 12px; font-size: 22px; color: #f6c46a; font-weight: 600; font-family: "Geist Mono", monospace; }
+.script { position: absolute; left: 34px; right: 34px; top: 204px; font-size: 25px; line-height: 1.5; }
+.script div { padding: 2px 10px; border-radius: 6px; white-space: nowrap; }
+.script tt { font-family: "Geist Mono", monospace; color: #8a8a96; margin-right: 14px; font-size: 22px; }
+</style>
+<div class="stage" id="stage">
+  <svg class="wall" viewBox="0 0 1280 800" width="1280" height="800">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1f2a3a"/>
+        <stop offset="0.55" stop-color="#3b4d63"/>
+        <stop offset="1" stop-color="#6d7f90"/>
+      </linearGradient>
+      <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#f0cfae"/>
+        <stop offset="1" stop-color="#b98f78"/>
+      </linearGradient>
+    </defs>
+    <rect width="1280" height="800" fill="url(#sky)"/>
+    <g fill="#e8eef7" opacity="0.7">
+      <circle cx="120" cy="90" r="1.4"/><circle cx="310" cy="160" r="1"/><circle cx="1180" cy="70" r="1.6"/>
+      <circle cx="980" cy="210" r="1"/><circle cx="1230" cy="330" r="1.2"/><circle cx="40" cy="300" r="1"/>
+      <circle cx="640" cy="30" r="1.1"/><circle cx="860" cy="120" r="1"/>
+    </g>
+    <path d="M0 640 L90 590 L160 610 L240 560 L330 600 L420 640 L520 600 L600 520 L700 470 L770 520 L860 560 L960 600 L1060 560 L1150 530 L1220 560 L1280 590 L1280 800 L0 800 Z" fill="#3f4b5c"/>
+    <path d="M520 800 L640 540 L720 430 L760 410 L800 450 L880 540 L1000 640 L1120 700 L1280 760 L1280 800 Z" fill="#2a3240"/>
+    <path d="M720 430 L760 410 L800 450 L840 500 L815 492 L790 520 L770 480 L748 505 L738 470 L705 480 Z" fill="url(#glow)"/>
+    <path d="M0 800 L0 700 L80 660 L170 690 L260 650 L360 700 L470 740 L560 720 L640 760 L700 800 Z" fill="#1d232e"/>
+    <path d="M80 660 L110 650 L150 672 L120 668 L100 680 Z" fill="#c9b3a3" opacity="0.8"/>
+  </svg>
+
+  <div class="panel" id="panel">
+    <div class="bar">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#9a9aa6" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 L21 21"/></svg>
+      <div class="query" id="query"></div>
+    </div>
+    <div class="divider" id="divider"></div>
+    <div class="col" id="col"></div>
+
+    <div class="list" id="list1">
+      <small>DOCUMENTS</small>
+      <div class="row on"><div class="icon"></div><div><b>Globex MSA.pdf<em>p.2</em></b><span>4. Term and termination</span></div></div>
+      <div class="row"><div class="icon"></div><div><b>Initech NDA.pdf</b><span>Either party may end…</span></div></div>
+    </div>
+    <div class="prev" id="prev1">
+      <div class="paper">
+        <div class="sheet" id="sheet">
+          <h4>1. Services</h4>
+          <div class="ln" style="width:96%"></div><div class="ln" style="width:88%"></div><div class="ln" style="width:92%"></div><div class="ln" style="width:60%"></div>
+          <h4>2. Fees</h4>
+          <div class="ln" style="width:94%"></div><div class="ln" style="width:82%"></div><div class="ln" style="width:70%"></div>
+          <h4>4. Term and termination</h4>
+          <p>This Agreement runs for three years. <span class="mark" id="mark">Either party may terminate it early for convenience with ninety (90) days' written notice.</span></p>
+          <div class="ln" style="width:90%"></div><div class="ln" style="width:76%"></div>
+        </div>
+        <div class="tag" id="tag1">p.2</div>
+      </div>
+      <div class="title">Globex Master Services Agreement.pdf</div>
+      <div class="meta"><span class="star">★</span> Matches the text on page 2</div>
+      <div class="btns"><div class="btn blue" id="open1">Open at page 2</div><div class="btn">Show in Folder</div></div>
+    </div>
+
+    <div class="list" id="list2">
+      <small>RECORDINGS</small>
+      <div class="row on"><div class="icon audio"><i style="height:14px"></i><i style="height:26px"></i><i style="height:18px"></i><i style="height:30px"></i><i style="height:12px"></i></div><div><b>Q3 budget review<em>0:30</em></b><span>“…freeze hiring until…”</span></div></div>
+      <div class="row"><div class="icon"></div><div><b>Hiring plan.docx</b><span>Headcount for 2027</span></div></div>
+    </div>
+    <div class="prev" id="prev2">
+      <div class="wave">
+        <div class="bars" id="bars"></div>
+        <div class="head" id="head"><b id="clock">0:00</b></div>
+        <div class="script">
+          <div id="l1"><tt>0:22</tt>Sam: Can we afford two more hires?</div>
+          <div id="l2"><tt>0:30</tt>Maya: No. We freeze hiring until January.</div>
+        </div>
+      </div>
+      <div class="title">Q3 budget review (recording)</div>
+      <div class="meta"><span class="star">★</span> Matches what was said at 0:30</div>
+      <div class="btns"><div class="btn blue" id="open2">Play from 0:30</div><div class="btn">Show in Folder</div></div>
+    </div>
+  </div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 13;
+window.POSTER = 6.2;
+
+const $ = (id) => document.getElementById(id);
+const Q1 = "the clause about ending the Globex contract early";
+const Q2 = "when did they decide to freeze hiring";
+const T1 = 0.8, STEP1 = 0.04, T2 = 7.3, STEP2 = 0.045;
+const END1 = T1 + Q1.length * STEP1, END2 = T2 + Q2.length * STEP2;
+
+// The waveform: fixed bar heights, so every run draws the same recording.
+const BARS = 72;
+const bars = Array.from({ length: BARS }, (_, i) => {
+  const bar = document.createElement("i");
+  const h = 0.18 + 0.82 * Math.abs(Math.sin(i * 1.73) * Math.cos(i * 0.41 + 0.6));
+  bar.style.height = `${Math.round(h * 120)}px`;
+  $("bars").append(bar);
+  return bar;
+});
+// The playhead sits at 0:30 of a 2:00 clip.
+const HEAD_AT = 0.25;
+const WAVE_W = 716 - 68;
+
+window.render = (t) => {
+  // The panel opens as a bare search bar over the wallpaper and closes the
+  // same way, so the loop starts and ends on the wallpaper alone.
+  const open = Math.min(progress(t, 0.2, 0.5), 1 - progress(t, 12.3, 0.5));
+  appear($("panel"), open);
+  const tall = Math.min(progress(t, END1 + 0.15, 0.7), 1 - progress(t, 12.0, 0.4));
+  $("panel").style.height = `${104 + tall * 616}px`;
+  $("divider").style.opacity = tall;
+  $("col").style.opacity = tall;
+
+  // The query: typed, then selected and replaced by the second question.
+  const caretOn = Math.floor(t * 2.4) % 2 === 0;
+  let text = "", caret = caretOn;
+  if (t < 6.8) {
+    text = typed(Q1, t, T1, STEP1);
+    if (t > 6.4) text = `<span class="sel">${Q1}</span>`, caret = false;
+    else if (t > T1 && t < END1 + 0.3) caret = true;
+  } else {
+    text = typed(Q2, t, T2, STEP2);
+    if (t > T2 && t < END2 + 0.3) caret = true;
+  }
+  $("query").innerHTML = text + (caret && t < 12 ? '<span class="caret"></span>' : "");
+
+  // First answer: the contract, scrolled to the clause and marked.
+  // While the second question is typed the old results wait, dimmed, then
+  // give way to the new ones.
+  const stale = 1 - 0.65 * progress(t, 6.7, 0.35);
+  const gone = 1 - progress(t, END2 + 0.05, 0.3);
+  appear($("list1"), Math.min(progress(t, END1 + 0.35, 0.6), gone));
+  appear($("prev1"), Math.min(progress(t, END1 + 0.55, 0.6), gone));
+  $("list1").style.opacity *= stale;
+  $("prev1").style.opacity *= stale;
+  $("sheet").style.transform = `translateY(${-track([[4.4, 0], [5.2, 330]], t)}px)`;
+  $("mark").style.backgroundSize = `${progress(t, 5.3, 0.8, easeInOut) * 100}% 100%`;
+  $("tag1").textContent = t > 5.5 ? "p.2 · best match marked" : "p.2";
+  const press1 = progress(t, 6.0, 0.15) - progress(t, 6.15, 0.25);
+  $("open1").style.transform = `scale(${1 - 0.06 * press1})`;
+  $("open1").style.boxShadow = `0 0 0 ${press1 * 6}px rgba(47, 123, 240, 0.35)`;
+
+  // Second answer: the recording; the playhead jumps to the moment.
+  const second = Math.min(progress(t, END2 + 0.3, 0.6), 1 - progress(t, 11.9, 0.35));
+  appear($("list2"), second);
+  appear($("prev2"), Math.min(progress(t, END2 + 0.5, 0.6), 1 - progress(t, 11.9, 0.35)));
+  const at = track([[9.8, 0], [10.3, HEAD_AT]], t, easeOut);
+  $("head").style.left = `${34 + at * WAVE_W - 2}px`;
+  const secs = Math.round(at * 120);
+  $("clock").textContent = `0:${String(secs).padStart(2, "0")}`;
+  bars.forEach((bar, i) => (bar.style.background = (i + 0.5) / BARS <= at ? "#f6c46a" : "#4a4a56"));
+  const said = progress(t, 10.4, 0.4);
+  $("l2").style.background = `rgba(246, 196, 106, ${0.28 * said})`;
+  $("l2").style.color = said > 0.5 ? "#fff" : "#c8c8d0";
+  $("l1").style.color = "#9a9aa6";
+  const press2 = progress(t, 11.0, 0.15) - progress(t, 11.15, 0.25);
+  $("open2").style.transform = `scale(${1 - 0.06 * press2})`;
+  $("open2").style.boxShadow = `0 0 0 ${press2 * 6}px rgba(47, 123, 240, 0.35)`;
+};
+render(window.POSTER);
+</script>

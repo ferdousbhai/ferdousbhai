@@ -1,0 +1,146 @@
+<!doctype html>
+<!-- ghost: the owner asks the HUD for a draft; claude has hit its limit
+     before saying anything, so Ghost hands the turn to codex, and the answer
+     arrives in the same conversation. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 0%, #1d2030 0%, #12131b 70%); font-family: "Geist", sans-serif; color: #c0caf5; }
+.hud { position: absolute; left: 130px; top: 40px; width: 1020px; height: 720px; border-radius: 20px; background: #1a1b26; border: 1px solid #2f3549; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
+.header { position: absolute; left: 32px; right: 32px; top: 22px; height: 52px; display: flex; align-items: center; gap: 16px; }
+.header .name { font-size: 32px; font-weight: 650; color: #e0e4f7; }
+.header .who { margin-left: auto; font-size: 24px; color: #737aa2; font-family: "Geist Mono", monospace; }
+.chips { position: absolute; left: 32px; top: 96px; display: flex; gap: 12px; }
+.chip { position: relative; width: 148px; height: 56px; border-radius: 12px; border: 2px solid #2f3549; background: #1f2130; display: flex; align-items: center; justify-content: center; font-family: "Geist Mono", monospace; font-size: 25px; color: #737aa2; }
+.ring { position: absolute; top: 96px; width: 148px; height: 56px; border-radius: 12px; border: 2px solid #fbbf24; box-shadow: 0 0 24px rgba(251, 191, 36, 0.35); }
+.status { position: absolute; left: 32px; top: 166px; font-size: 26px; color: #737aa2; white-space: pre; font-family: "Geist Mono", monospace; }
+.status b { font-weight: 500; }
+.rule { position: absolute; left: 0; right: 0; top: 214px; height: 1px; background: #2a2e42; }
+.me { position: absolute; right: 32px; top: 230px; max-width: 700px; padding: 18px 26px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.1); background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(249, 115, 22, 0.15) 55%, rgba(251, 113, 133, 0.1)); font-size: 31px; line-height: 1.35; color: #e0e4f7; }
+.note { position: absolute; left: 32px; top: 362px; display: flex; align-items: center; gap: 12px; font-size: 25px; color: #f7a3b3; padding: 8px 18px; border-radius: 10px; background: rgba(247, 118, 142, 0.1); border: 1px solid rgba(247, 118, 142, 0.3); font-family: "Geist Mono", monospace; }
+.note i { width: 10px; height: 10px; border-radius: 50%; background: #f7768e; }
+.reply { position: absolute; left: 32px; top: 430px; width: 900px; display: flex; gap: 18px; }
+.reply .body { font-size: 31px; line-height: 1.42; color: #c0caf5; white-space: pre-wrap; }
+.reply .body q { color: #e0e4f7; quotes: "“" "”"; }
+.reply .via { margin-top: 10px; font-size: 22px; color: #565f89; font-family: "Geist Mono", monospace; }
+.dots { position: absolute; left: 82px; top: 422px; display: flex; gap: 10px; }
+.dots i { width: 12px; height: 12px; border-radius: 50%; background: #c8dcff; }
+.composer { position: absolute; left: 32px; right: 32px; bottom: 26px; height: 72px; border-radius: 14px; border: 1px solid #2f3549; background: #16161e; display: flex; align-items: center; padding: 0 24px; font-size: 28px; color: #e0e4f7; white-space: pre; }
+.composer .ph { color: #565f89; }
+.caret { display: inline-block; width: 3px; height: 32px; margin-left: 2px; vertical-align: -6px; background: #fbbf24; }
+</style>
+<div class="stage" id="stage">
+  <div class="hud" id="hud">
+    <div class="header" id="header">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px rgba(251,191,36,0.6))"><path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8zM9 10h.01M15 10h.01"/></svg>
+      <span class="name">Wren</span>
+      <span class="who">one conversation</span>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="ring" id="ring"></div>
+    <div class="status" id="status"></div>
+    <div class="rule"></div>
+    <div class="me" id="me">Draft a reply to Acme about moving the launch.</div>
+    <div class="note" id="note"><i></i>claude: limit reached · codex takes the turn</div>
+    <div class="dots" id="dots"><i></i><i></i><i></i></div>
+    <div class="reply" id="reply">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8zM9 10h.01M15 10h.01"/></svg>
+      <div><div class="body" id="body"></div><div class="via" id="via">via codex</div></div>
+    </div>
+    <div class="composer" id="composer"></div>
+  </div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 13;
+window.POSTER = 9.8;
+
+const HARNESSES = ["claude", "codex", "grok", "copilot", "opencode", "pi"];
+const ASK = "Draft a reply to Acme about moving the launch.";
+const ANSWER = 'Here is a draft:\n<q>Hi Maya, the launch moves to 14 March. Same scope, and the new plan reaches you Friday.</q>';
+const PLAIN = ANSWER.replace(/<\/?q>/g, "");
+const $ = (id) => document.getElementById(id);
+const chips = HARNESSES.map((name) => {
+  const chip = document.createElement("div");
+  chip.className = "chip";
+  chip.textContent = name;
+  $("chips").append(chip);
+  return chip;
+});
+const chipX = (i) => 32 + i * (148 + 12);
+
+// Beats: type (1.0), send (2.9), claude tries (3.1), limit (4.4), hand-off
+// (5.5), codex answers (6.2 onward).
+const TYPE = 1.0, STEP = 0.035, SEND = TYPE + ASK.length * STEP + 0.3;
+const LIMIT = 4.4, HAND = 5.5, SPEAK = 6.2, CHAR = 0.028;
+
+// The streamed answer up to n plain characters, keeping the quote markup.
+const streamed = (n) => {
+  let out = "", seen = 0;
+  for (let i = 0; i < ANSWER.length && seen < n; i++) {
+    if (ANSWER[i] === "<") { const j = ANSWER.indexOf(">", i); out += ANSWER.slice(i, j + 1); i = j; continue; }
+    out += ANSWER[i];
+    seen++;
+  }
+  return out.includes("<q>") && !out.includes("</q>") ? out + "</q>" : out;
+};
+
+window.render = (t) => {
+  cycleFade($("stage"), t, CYCLE);
+
+  appear($("header"), progress(t, 0.2, 0.6));
+  chips.forEach((chip, i) => appear(chip, progress(t, 0.4 + i * 0.06, 0.6)));
+
+  // Composer: the question is typed, then sent into the thread.
+  const typing = t >= TYPE && t < SEND;
+  const caret = Math.floor(t * 2.4) % 2 === 0 || typing;
+  const draft = t < SEND ? typed(ASK, t, TYPE, STEP) : "";
+  $("composer").innerHTML = draft
+    ? draft + (caret ? '<span class="caret"></span>' : "")
+    : (t > 0.6 ? '<span class="ph">Ask Wren…</span>' : "");
+  appear($("composer"), progress(t, 0.6, 0.6));
+  appear($("me"), progress(t, SEND, 0.5), 16);
+
+  // claude takes the turn first, then hits its limit before any text.
+  const claudeOn = t >= SEND + 0.2 && t < LIMIT;
+  const out = t >= LIMIT;
+  const codexOn = t >= HAND;
+  chips.forEach((chip, i) => {
+    const active = (i === 0 && claudeOn) || (i === 1 && codexOn);
+    chip.style.color = active ? "#fcd34d" : i === 0 && out ? "#9a5a6a" : "#737aa2";
+    chip.style.borderColor = i === 0 && out ? "rgba(247, 118, 142, 0.45)" : "#2f3549";
+    chip.style.textDecoration = i === 0 && out ? "line-through" : "none";
+    chip.style.background = i === 0 && out ? "#181922" : active ? "rgba(251, 191, 36, 0.08)" : "#1f2130";
+    chip.style.borderStyle = i === 0 && out ? "dashed" : "solid";
+  });
+  const ringIn = progress(t, SEND + 0.2, 0.4);
+  const ringX = track([[HAND - 0.1, chipX(0)], [HAND + 0.5, chipX(1)]], t);
+  const ringDim = 1 - 0.85 * (progress(t, LIMIT, 0.2) - progress(t, HAND - 0.1, 0.3));
+  $("ring").style.left = `${ringX}px`;
+  $("ring").style.opacity = ringIn * ringDim;
+  $("ring").style.borderColor = t >= LIMIT && t < HAND ? "#f7768e" : "#fbbf24";
+
+  let status = "";
+  if (t >= SEND + 0.2 && t < LIMIT) status = "<b style='color:#fcd34d'>claude</b> is taking the turn…";
+  else if (t >= LIMIT && t < HAND) status = "<b style='color:#f7768e'>claude</b> <span style='color:#f7a3b3'>limit reached</span>, trying codex";
+  else if (t >= HAND && t < SPEAK + PLAIN.length * CHAR) status = "<b style='color:#fcd34d'>codex</b> is answering";
+  else if (t >= HAND) status = "<b style='color:#9ece6a'>codex</b> answered · same conversation";
+  $("status").innerHTML = status;
+  $("status").style.opacity = progress(t, SEND + 0.2, 0.3);
+
+  // Thinking dots while a harness holds the turn without text yet.
+  const thinking = Math.min(progress(t, SEND + 0.3, 0.3), 1 - progress(t, SPEAK - 0.1, 0.2));
+  $("dots").style.opacity = thinking;
+  [...$("dots").children].forEach((dot, i) => (dot.style.opacity = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 7 - i * 0.9))));
+  $("dots").style.top = `${t < LIMIT ? 382 : 444}px`;
+
+  appear($("note"), progress(t, LIMIT + 0.15, 0.5));
+  appear($("reply"), progress(t, SPEAK - 0.1, 0.4));
+  $("body").innerHTML = streamed(Math.floor(Math.max(0, t - SPEAK) / CHAR));
+  $("via").style.opacity = progress(t, SPEAK + PLAIN.length * CHAR, 0.5);
+};
+render(window.POSTER);
+</script>

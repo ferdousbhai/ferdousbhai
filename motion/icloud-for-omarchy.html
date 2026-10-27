@@ -1,0 +1,206 @@
+<!doctype html>
+<!-- icloud-for-omarchy: Notes, Photos and Find My open as native windows and
+     tile across an Omarchy desktop; a checklist is ticked, the photo library
+     fills month by month, and the devices show up on the map. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; background: linear-gradient(160deg, #1f2335 0%, #16161e 60%, #1a1b26 100%); font-family: "Geist", sans-serif; color: #c0caf5; }
+.waybar { position: absolute; left: 0; right: 0; top: 0; height: 44px; display: flex; align-items: center; padding: 0 22px; font-family: "Geist Mono", monospace; font-size: 22px; color: #a9b1d6; }
+.waybar .ws { display: flex; gap: 18px; }
+.waybar .ws b { color: #7aa2f7; font-weight: 600; }
+.waybar .clock { position: absolute; left: 50%; transform: translateX(-50%); }
+.waybar .right { margin-left: auto; color: #565f89; }
+.win { position: absolute; border-radius: 10px; border: 2px solid #414868; background: #1a1b26; overflow: hidden; transform-origin: center; }
+.win .tb { height: 50px; display: flex; align-items: center; justify-content: center; background: #16161e; border-bottom: 1px solid #292e42; font-size: 24px; font-weight: 650; color: #c0caf5; }
+.notes .body { padding: 26px 34px; }
+.notes h2 { margin: 0; font-size: 46px; font-weight: 700; color: #c0caf5; letter-spacing: -0.01em; }
+.notes .date { margin: 6px 0 22px; font-size: 22px; color: #565f89; }
+.item { display: flex; align-items: center; gap: 18px; font-size: 34px; margin-bottom: 20px; white-space: nowrap; }
+.box { flex: none; width: 34px; height: 34px; border-radius: 8px; border: 2px solid #7aa2f7; display: flex; align-items: center; justify-content: center; }
+.box svg { width: 24px; height: 24px; }
+.item .txt { position: relative; }
+.item .strike { position: absolute; left: 0; top: 52%; height: 2px; background: #565f89; transform-origin: left; width: 100%; }
+.photos .scroll { position: absolute; left: 0; right: 0; top: 50px; padding: 12px 22px; }
+.photos h3 { margin: 0 0 8px; font-size: 27px; font-weight: 700; color: #c0caf5; }
+.grid { display: grid; grid-template-columns: repeat(5, 106px); gap: 8px; margin-bottom: 12px; }
+.ph { position: relative; width: 106px; height: 90px; border-radius: 6px; overflow: hidden; }
+.ph .sun { position: absolute; width: 34px; height: 34px; border-radius: 50%; background: rgba(255, 255, 255, 0.75); }
+.ph .hill { position: absolute; left: -20%; right: -20%; bottom: -40%; height: 75%; border-radius: 50%; background: rgba(0, 0, 0, 0.28); }
+.findmy .map { position: absolute; left: 0; right: 0; top: 50px; bottom: 0; }
+.pin { position: absolute; width: 0; height: 0; }
+.pin .ring { position: absolute; left: -40px; top: -40px; width: 80px; height: 80px; border-radius: 50%; border: 3px solid #7aa2f7; }
+.pin .dot { position: absolute; left: -24px; top: -24px; width: 48px; height: 48px; border-radius: 50%; background: #3d59a1; border: 3px solid #c0caf5; display: flex; align-items: center; justify-content: center; }
+.pin .label { position: absolute; left: 34px; top: -22px; white-space: nowrap; font-size: 25px; font-weight: 600; padding: 4px 14px; border-radius: 10px; background: rgba(22, 22, 30, 0.9); color: #c0caf5; }
+.pin.flip .label { left: auto; right: 34px; }
+.pin .label small { font-weight: 400; color: #9aa5ce; font-size: 22px; }
+</style>
+<div class="stage" id="stage">
+  <div class="waybar" id="waybar">
+    <div class="ws"><b>1</b><span>2</span><span>3</span></div>
+    <div class="clock">Saturday 10:42</div>
+    <div class="right">wifi · 82%</div>
+  </div>
+
+  <div class="win notes" id="notes">
+    <div class="tb">Notes</div>
+    <div class="body">
+      <h2>Weekend</h2>
+      <div class="date">Saturday, 24 October 2026</div>
+      <div id="items"></div>
+    </div>
+  </div>
+
+  <div class="win photos" id="photos">
+    <div class="tb">All Photos</div>
+    <div class="scroll" id="scroll">
+      <h3 id="m1">August 2026</h3><div class="grid" id="g1"></div>
+      <h3 id="m2">September 2026</h3><div class="grid" id="g2"></div>
+    </div>
+  </div>
+
+  <div class="win findmy" id="findmy">
+    <div class="tb">Find My</div>
+    <svg class="map" viewBox="0 0 620 310" preserveAspectRatio="xMidYMid slice">
+      <rect width="620" height="310" fill="#1d2133"/>
+      <path d="M0 230 C90 210 150 260 230 250 C300 240 330 290 420 310 L0 310 Z" fill="#22304f"/>
+      <ellipse cx="470" cy="80" rx="80" ry="46" fill="#1f2d27"/>
+      <ellipse cx="120" cy="70" rx="50" ry="30" fill="#1f2d27"/>
+      <g stroke="#2a2f45" stroke-width="7" fill="none" stroke-linecap="round">
+        <path d="M0 140 H620"/><path d="M60 0 V230"/><path d="M200 0 V250"/><path d="M360 0 V310"/><path d="M520 0 V310"/>
+        <path d="M0 40 H620"/><path d="M200 200 H620"/>
+      </g>
+      <path id="route" d="M110 0 L240 105 L430 175 L620 250" stroke="#394064" stroke-width="13" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="pin flip" id="pinPhone">
+      <div class="ring"></div>
+      <div class="dot"><svg width="18" height="26" viewBox="0 0 18 26"><rect x="1.5" y="1.5" width="15" height="23" rx="3" fill="none" stroke="#c0caf5" stroke-width="2.4"/></svg></div>
+      <div class="label">iPhone <small id="phoneAgo">· just now</small></div>
+    </div>
+    <div class="pin" id="pinMac">
+      <div class="ring"></div>
+      <div class="dot"><svg width="28" height="20" viewBox="0 0 28 20"><rect x="4" y="1.5" width="20" height="13" rx="2" fill="none" stroke="#c0caf5" stroke-width="2.4"/><path d="M1 18 H27" stroke="#c0caf5" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+      <div class="label">MacBook Air <small>· 54%</small></div>
+    </div>
+  </div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 13;
+window.POSTER = 8.9;
+
+const $ = (id) => document.getElementById(id);
+const ITEMS = ["oat milk", "sourdough", "flowers for Maya"];
+const TICK = [1.7, 2.4, 8.4];
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#1a1b26" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 L10 17 L19 7"/></svg>';
+const items = ITEMS.map((text) => {
+  const row = document.createElement("div");
+  row.className = "item";
+  row.innerHTML = `<div class="box">${CHECK}</div><span class="txt">${text}<i class="strike"></i></span>`;
+  $("items").append(row);
+  return row;
+});
+
+// Abstract photos: a sky gradient, a sun and a hill, from a fixed palette.
+const SKIES = [
+  ["#e0805a", "#f2c27a"], ["#7aa2f7", "#bcd3ff"], ["#9ece6a", "#e0e88a"], ["#bb9af7", "#f0a6c8"], ["#2ac3de", "#9be3c9"],
+  ["#f7768e", "#ffb38a"], ["#3d59a1", "#7dcfff"], ["#e0af68", "#ffe2a0"], ["#73daca", "#c3f0e1"], ["#ff9e64", "#ffd7a8"],
+];
+const photo = (i) => {
+  const [a, b] = SKIES[i % SKIES.length];
+  const tile = document.createElement("div");
+  tile.className = "ph";
+  tile.style.background = `linear-gradient(${150 + (i * 37) % 60}deg, ${a}, ${b})`;
+  tile.innerHTML = `<div class="sun" style="left:${18 + (i * 23) % 50}px;top:${14 + (i * 11) % 22}px"></div><div class="hill"></div>`;
+  return tile;
+};
+const tiles = [];
+for (let i = 0; i < 10; i++) {
+  const tile = photo(i);
+  $(i < 5 ? "g1" : "g2").append(tile);
+  tiles.push(tile);
+}
+
+// Hyprland's dwindle layout: the first window fills the screen, the second
+// splits it, the third splits the second.
+const FULL = [14, 58, 1252, 728], LEFT = [14, 58, 619, 728], RIGHT = [647, 58, 619, 728];
+const TOP = [647, 58, 619, 357], BOTTOM = [647, 429, 619, 357];
+const OPEN_PHOTOS = 3.0, OPEN_FIND = 5.6, CLOSE = 11.9;
+const place = (el, box, open) => {
+  const [x, y, w, h] = box;
+  Object.assign(el.style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` });
+  el.style.opacity = open;
+  el.style.transform = `scale(${0.94 + 0.06 * open})`;
+  el.style.visibility = open > 0 ? "visible" : "hidden";
+};
+const ACTIVE = "#7aa2f7", IDLE = "#414868";
+
+window.render = (t) => {
+  appear($("waybar"), progress(t, 0, 0.4));
+  $("waybar").style.opacity = Math.min(progress(t, 0, 0.4), 1 - progress(t, CLOSE + 0.5, 0.5));
+
+  // Windows open, re-tile, and close in reverse at the end of the cycle.
+  const notesOpen = Math.min(progress(t, 0.35, 0.5), 1 - progress(t, CLOSE + 0.3, 0.35));
+  const photosOpen = Math.min(progress(t, OPEN_PHOTOS + 0.15, 0.5), 1 - progress(t, CLOSE + 0.15, 0.35));
+  const findOpen = Math.min(progress(t, OPEN_FIND + 0.15, 0.5), 1 - progress(t, CLOSE, 0.35));
+  place($("notes"), track([[OPEN_PHOTOS, FULL], [OPEN_PHOTOS + 0.5, LEFT]], t), notesOpen);
+  place($("photos"), track([[OPEN_FIND, RIGHT], [OPEN_FIND + 0.5, TOP]], t), photosOpen);
+  place($("findmy"), BOTTOM, findOpen);
+
+  // Focus follows the story: Notes, Photos, Find My, back to Notes, Find My.
+  const focus = t < OPEN_PHOTOS ? "notes" : t < OPEN_FIND ? "photos" : t < 7.9 ? "findmy" : t < 9.0 ? "notes" : "findmy";
+  ["notes", "photos", "findmy"].forEach((id) => ($(id).style.borderColor = id === focus ? ACTIVE : IDLE));
+
+  // Notes: the list arrives, then items are ticked.
+  items.forEach((row, i) => {
+    appear(row, progress(t, 0.8 + i * 0.12, 0.5));
+    const k = progress(t, TICK[i], 0.35);
+    const box = row.querySelector(".box");
+    box.style.background = k > 0 ? `rgba(122, 162, 247, ${k})` : "transparent";
+    box.querySelector("svg").style.opacity = k;
+    box.style.transform = `scale(${1 + 0.18 * Math.sin(Math.PI * k)})`;
+    row.querySelector(".strike").style.transform = `scaleX(${progress(t, TICK[i] + 0.15, 0.4, easeInOut)})`;
+    row.querySelector(".txt").style.color = k >= 1 ? "#565f89" : "#c0caf5";
+  });
+
+  // Photos: the library syncs in a month at a time.
+  appear($("m1"), progress(t, OPEN_PHOTOS + 0.5, 0.4));
+  appear($("m2"), progress(t, OPEN_PHOTOS + 1.4, 0.4));
+  tiles.forEach((tile, i) => {
+    const start = OPEN_PHOTOS + (i < 5 ? 0.65 : 1.55) + (i % 5) * 0.1;
+    const k = progress(t, start, 0.45);
+    tile.style.opacity = k;
+    tile.style.transform = `scale(${0.8 + 0.2 * k})`;
+  });
+
+  // Find My: the devices drop onto the map and pulse; the iPhone moves.
+  const route = $("route");
+  const len = route.getTotalLength();
+  const mapPoint = (p) => {
+    const pt = route.getPointAtLength(len * p);
+    // The map is drawn at 620×310 and slice-scaled into the pane body.
+    const s = Math.max(619 / 620, 307 / 310);
+    return [pt.x * s + (619 - 620 * s) / 2, 50 + pt.y * s + (307 - 310 * s) / 2];
+  };
+  const along = track([[9.2, 0.6], [10.8, 0.4]], t);
+  const [px, py] = mapPoint(along);
+  const pins = [[$("pinPhone"), px, py, OPEN_FIND + 0.7], [$("pinMac"), 80, 284, OPEN_FIND + 1.1]];
+  pins.forEach(([pin, x, y, start]) => {
+    const k = progress(t, start, 0.5);
+    pin.style.left = `${x}px`;
+    pin.style.top = `${y - (1 - k) * 30}px`;
+    pin.style.opacity = k;
+    const pulse = ((t - start) / 1.4) % 1;
+    const ring = pin.querySelector(".ring");
+    ring.style.opacity = k >= 1 ? 0.8 * (1 - pulse) : 0;
+    ring.style.transform = `scale(${0.6 + 0.9 * pulse})`;
+  });
+  $("pinMac").querySelector(".label").style.opacity = progress(t, OPEN_FIND + 1.4, 0.4);
+  $("pinPhone").querySelector(".label").style.opacity = progress(t, OPEN_FIND + 1.0, 0.4);
+  $("phoneAgo").textContent = t > 9.2 && t < 10.9 ? "· moving" : "· just now";
+};
+render(window.POSTER);
+</script>

@@ -1,0 +1,182 @@
+<!doctype html>
+<!-- cloudchef: a one-line prompt becomes a Cloudflare app. The files stream in,
+     Workers, D1 and R2 light up, the app goes live on its workers.dev URL, and
+     a visitor books a class in it, which lands as a row in D1. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; background: #11121a; font-family: "Geist Mono", monospace; color: #c0caf5; }
+.window { position: absolute; left: 40px; top: 40px; width: 1200px; height: 720px; border-radius: 20px; background: #1a1b26; border: 1px solid #2c3048; overflow: hidden; }
+.titlebar { height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 28px; border-bottom: 1px solid #2c3048; font-size: 22px; font-weight: 600; letter-spacing: 0.18em; color: #c0caf5; }
+.titlebar svg { width: 40px; height: 30px; }
+.ask { position: absolute; left: 56px; top: 212px; width: 1088px; }
+.ask h1 { margin: 0 0 22px; font-size: 48px; font-weight: 700; letter-spacing: -0.01em; color: #c0caf5; }
+.card { position: relative; height: 112px; border-radius: 14px; background: #24283b; border: 2px solid #3a3f5c; padding: 0 28px; display: flex; align-items: center; font-size: 32px; white-space: pre; }
+.card .ph { color: #6b7399; }
+.caret { display: inline-block; width: 15px; height: 36px; margin-left: 2px; vertical-align: -7px; background: #ffad70; }
+.send { position: absolute; right: 22px; top: 24px; width: 64px; height: 64px; border-radius: 12px; background: #3a3f5c; display: grid; place-items: center; color: #1a1b26; font-size: 34px; font-weight: 700; }
+.label { position: absolute; font-size: 26px; color: #7a84b0; }
+.files { position: absolute; left: 56px; top: 290px; width: 500px; }
+.file { height: 56px; display: flex; align-items: center; gap: 18px; font-size: 30px; }
+.file .mark { width: 28px; text-align: center; }
+.chips { position: absolute; left: 56px; top: 538px; display: flex; gap: 14px; }
+.chip { height: 64px; padding: 0 24px; border-radius: 12px; border: 2px solid #2c3048; display: flex; align-items: center; gap: 12px; font-size: 28px; font-weight: 600; color: #565f89; }
+.chip i { width: 14px; height: 14px; border-radius: 50%; background: #3a3f5c; }
+.status { position: absolute; left: 56px; top: 630px; font-size: 28px; white-space: pre; }
+.preview { position: absolute; left: 592px; top: 230px; width: 552px; height: 450px; border-radius: 16px; background: #f6f4ef; overflow: hidden; color: #2a2733; font-family: "Geist", sans-serif; box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6); }
+.bar { height: 62px; background: #24283b; display: flex; align-items: center; gap: 12px; padding: 0 20px; font-family: "Geist Mono", monospace; font-size: 26px; color: #c0caf5; white-space: pre; }
+.bar i { width: 14px; height: 14px; border-radius: 50%; background: #9ece6a; box-shadow: 0 0 10px #9ece6a; }
+.app { padding: 26px 30px 0; }
+.app h2 { margin: 0; font-size: 40px; font-weight: 700; letter-spacing: -0.02em; }
+.app p { margin: 4px 0 18px; font-size: 26px; color: #7b7685; }
+.slot { position: relative; height: 82px; display: flex; align-items: center; border-top: 1px solid #e2ddd3; font-size: 28px; }
+.slot .when { width: 176px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.slot .what { flex: 1; color: #4a4655; }
+.btn { width: 140px; height: 54px; border-radius: 27px; background: #2a2733; color: #f6f4ef; display: grid; place-items: center; font-size: 26px; font-weight: 600; }
+.slab { position: absolute; left: 592px; top: 230px; width: 552px; height: 450px; border-radius: 16px; border: 2px dashed #3a3f5c; display: grid; place-items: center; font-size: 28px; color: #565f89; }
+.cursor { position: absolute; left: 0; top: 0; width: 40px; height: 48px; }
+</style>
+<div class="stage" id="stage">
+  <div class="window">
+    <div class="titlebar">
+      <svg viewBox="0 0 40 30"><g fill="#ffad70"><circle cx="21" cy="13" r="11"/><circle cx="10" cy="19" r="9"/><circle cx="31" cy="19" r="8"/><rect x="10" y="17" width="21" height="11" rx="3"/></g><path d="M12 15l4 4-4 4M19 23h7" stroke="#1a1b26" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      CLOUDCHEF
+    </div>
+    <div class="ask" id="ask">
+      <h1 id="heading">What are we building?</h1>
+      <div class="card" id="card"><span id="prompt"></span><div class="send" id="send">→</div></div>
+    </div>
+    <div class="label" id="buildLabel" style="left:56px;top:238px">build</div>
+    <div class="files" id="files"></div>
+    <div class="chips" id="chips"></div>
+    <div class="status" id="deployed" style="color:#9ece6a">✓ deployed in 38s</div>
+    <div class="status" id="saved" style="color:#ffad70">✓ booking saved to D1</div>
+    <div class="slab" id="slab"><span id="slabText"></span></div>
+    <div class="preview" id="preview">
+      <div class="bar"><i></i><span>yoga-studio.example.workers.dev</span></div>
+      <div class="app">
+        <h2>Lotus Room Yoga</h2>
+        <p>Book a class</p>
+        <div id="slots"></div>
+      </div>
+    </div>
+    <svg class="cursor" id="cursor" viewBox="0 0 40 48"><path d="M4 3 L4 38 L13 30 L19 44 L25 41 L19 28 L31 28 Z" fill="#fff" stroke="#1a1b26" stroke-width="2.5" stroke-linejoin="round"/></svg>
+  </div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 13;
+window.POSTER = 9.9;
+
+const $ = (id) => document.getElementById(id);
+const PROMPT = "a booking page for a yoga studio";
+const TYPE_AT = 1.0, TYPE_STEP = 0.05;
+const TYPED_END = TYPE_AT + PROMPT.length * TYPE_STEP;
+
+// Each file streams in, and the Cloudflare primitive it uses lights up with it.
+const FILES = [["worker.ts", 0], ["schema.sql", 1], ["app.tsx", -1], ["wrangler.jsonc", 2]];
+const FILE_AT = FILES.map((_, i) => 4.2 + i * 0.5);
+const RUN = 0.4;
+const files = FILES.map(([name]) => {
+  const row = document.createElement("div");
+  row.className = "file";
+  row.innerHTML = `<span class="mark"></span><span>${name}</span>`;
+  $("files").append(row);
+  return row;
+});
+const chips = ["Workers", "D1", "R2"].map((name) => {
+  const chip = document.createElement("div");
+  chip.className = "chip";
+  chip.innerHTML = `<i></i>${name}`;
+  $("chips").append(chip);
+  return chip;
+});
+const CHIP_AT = [0, 1, 3].map((i) => FILE_AT[i] + RUN);
+
+const SLOTS = [["Mon 7:00", "Vinyasa"], ["Mon 18:30", "Yin"], ["Tue 7:00", "Slow flow"]];
+const slots = SLOTS.map(([when, what]) => {
+  const row = document.createElement("div");
+  row.className = "slot";
+  row.innerHTML = `<span class="when">${when}</span><span class="what">${what}</span><span class="btn">Book</span>`;
+  $("slots").append(row);
+  return row;
+});
+
+// The visitor's pointer, in window coordinates: in from the lower right, onto
+// the second Book button, a click, then a short drift away.
+const CLICK = 9.1;
+const POINTER = [[7.9, [1180, 760]], [8.9, [1036, 538]], [9.6, [1036, 538]], [10.4, [1090, 620]]];
+
+window.render = (t) => {
+  cycleFade($("stage"), t, CYCLE, 0.6);
+
+  // Opening: the question and an empty prompt; the prompt is typed and sent.
+  appear($("heading"), Math.min(progress(t, 0.2, 0.7), 1 - progress(t, 3.3, 0.4)));
+  const lift = track([[3.3, 0], [4.0, -182]], t);
+  $("ask").style.transform = `translateY(${lift}px)`;
+  const card = progress(t, 0.35, 0.7);
+  $("card").style.opacity = card;
+  $("card").style.filter = card >= 1 ? "none" : `blur(${(1 - card) * 4}px)`;
+  const text = typed(PROMPT, t, TYPE_AT, TYPE_STEP);
+  const typing = t > TYPE_AT - 0.3 && t < TYPED_END + 0.4;
+  const caret = typing && Math.floor(t * 2.4) % 2 === 0 ? '<span class="caret"></span>' : "";
+  $("prompt").innerHTML = text ? text + caret : `${caret}<span class="ph">Describe your app…</span>`;
+  const ready = progress(t, TYPED_END, 0.3);
+  const press = track([[TYPED_END + 0.4, 1], [TYPED_END + 0.5, 0.88], [TYPED_END + 0.7, 1]], t);
+  $("send").style.background = ready > 0.5 ? "#ffad70" : "#3a3f5c";
+  $("send").style.transform = `scale(${press})`;
+  $("card").style.borderColor = t > TYPED_END + 0.45 ? "#ffad70" : "#3a3f5c";
+
+  // The build streams: each file runs, then checks off; its primitive lights.
+  appear($("buildLabel"), progress(t, 3.9, 0.6));
+  files.forEach((row, i) => {
+    appear(row, progress(t, FILE_AT[i] - 0.2, 0.5));
+    const run = clamp((t - FILE_AT[i]) / RUN);
+    const done = run >= 1;
+    row.querySelector(".mark").textContent = done ? "✓" : "›";
+    row.style.color = done ? "#c0caf5" : "#7a84b0";
+    row.querySelector(".mark").style.color = done ? "#9ece6a" : "#ffad70";
+  });
+  chips.forEach((chip, i) => {
+    appear(chip, progress(t, 3.95 + i * 0.06, 0.6));
+    const on = t >= CHIP_AT[i];
+    const flash = on ? 1 - progress(t, CHIP_AT[i], 0.6) : 0;
+    chip.style.borderColor = on ? "#ffad70" : "#2c3048";
+    chip.style.color = on ? "#ffad70" : "#565f89";
+    chip.style.background = on ? `rgba(255,173,112,${0.1 + 0.2 * flash})` : "transparent";
+    chip.querySelector("i").style.background = on ? "#ffad70" : "#3a3f5c";
+  });
+  // D1 takes the booking: it flares again when the row lands.
+  const write = progress(t, CLICK + 0.3, 0.2) * (1 - progress(t, CLICK + 0.5, 0.8));
+  if (write > 0) chips[1].style.background = `rgba(255,173,112,${0.1 + 0.35 * write})`;
+
+  // Live: the deployed line, and the preview of the app on its URL.
+  appear($("deployed"), progress(t, 6.5, 0.5));
+  $("deployed").style.opacity = Math.min(progress(t, 6.5, 0.5), 1 - progress(t, CLICK + 0.1, 0.3));
+  appear($("saved"), progress(t, CLICK + 0.35, 0.6));
+  const live = progress(t, 6.7, 0.9);
+  $("preview").style.opacity = live;
+  $("preview").style.transform = `translateX(${(1 - live) * 60}px)`;
+  $("preview").style.filter = live >= 1 ? "none" : `blur(${(1 - live) * 6}px)`;
+  // Until it is live, the preview is an outline waiting for the deploy.
+  appear($("slab"), Math.min(progress(t, 4.0, 0.6), 1 - progress(t, 6.9, 0.5)), 0);
+  $("slabText").textContent = "deploying" + ".".repeat(Math.floor(t * 3) % 4);
+  slots.forEach((row, i) => appear(row, progress(t, 7.1 + i * 0.08, 0.6)));
+
+  // A visitor books the 18:30 class.
+  const [x, y] = track(POINTER, t);
+  $("cursor").style.transform = `translate(${x}px, ${y}px) scale(${track([[CLICK - 0.1, 1], [CLICK, 0.85], [CLICK + 0.15, 1]], t)})`;
+  $("cursor").style.opacity = Math.min(progress(t, 7.9, 0.4), 1 - progress(t, 10.6, 0.4));
+  const btn = slots[1].querySelector(".btn");
+  const booked = t >= CLICK;
+  btn.textContent = booked ? "Booked ✓" : "Book";
+  btn.style.background = booked ? "#4f7a2a" : "#2a2733";
+  btn.style.width = booked ? "176px" : "140px";
+  btn.style.transform = `scale(${track([[CLICK - 0.05, 1], [CLICK + 0.05, 0.92], [CLICK + 0.35, 1]], t)})`;
+  slots[1].style.background = booked ? `rgba(158,206,106,${0.18 * progress(t, CLICK, 0.4)})` : "transparent";
+};
+render(window.POSTER);
+</script>

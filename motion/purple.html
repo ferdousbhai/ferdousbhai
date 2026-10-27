@@ -1,0 +1,239 @@
+<!doctype html>
+<!-- purple: a Strudel pattern plays at 120 bpm, its tokens lighting on the beat;
+     a request reaches the agent over MCP, the agent rewrites the lead into a
+     dark sawtooth bassline, and on the next bar the music changes character. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; background: #0c0914; font-family: "Geist Mono", monospace; color: #e6e1f2; }
+.top { position: absolute; left: 0; top: 0; width: 1280px; height: 76px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.brand { position: absolute; left: 32px; top: 20px; font-size: 30px; font-weight: 800; letter-spacing: 0.3em; color: #c77dff; }
+.title { position: absolute; left: 270px; top: 24px; font-size: 26px; color: #a49cb8; }
+.bpm { position: absolute; left: 556px; top: 24px; font-size: 26px; color: #a49cb8; }
+.play { position: absolute; left: 702px; top: 14px; width: 150px; height: 48px; border-radius: 8px; display: grid; place-items: center; font-size: 22px; font-weight: 700; letter-spacing: 0.14em; }
+.pane { position: absolute; border-radius: 10px; background: rgba(34,26,51,0.45); border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
+.code { position: absolute; left: 0; top: 18px; font-size: 30px; line-height: 56px; white-space: pre; }
+.ln { display: inline-block; width: 64px; text-align: right; padding-right: 22px; color: rgba(230,225,242,0.28); }
+.fn { color: #c77dff; }
+.str { color: #ffb86b; }
+.num { color: #ff79c6; }
+.tok { border-radius: 5px; }
+.edit { display: inline-block; width: 4px; height: 38px; margin-left: 1px; vertical-align: -8px; background: #ff2d95; position: relative; }
+.edit::after { content: "agent"; position: absolute; left: -2px; top: -26px; padding: 0 6px; height: 24px; line-height: 24px; border-radius: 4px; background: #ff2d95; color: #0c0914; font-size: 18px; font-weight: 700; }
+.flashline { position: absolute; left: 0; width: 820px; height: 112px; background: #c77dff; }
+.lbl { position: absolute; font-size: 24px; letter-spacing: 0.14em; color: rgba(230,225,242,0.4); }
+.row { position: absolute; left: 24px; font-size: 26px; color: rgba(230,225,242,0.6); }
+.cell { position: absolute; width: 36px; height: 38px; border-radius: 5px; }
+.lane { position: absolute; left: 108px; top: 196px; width: 688px; height: 104px; border-radius: 6px; background: rgba(255,255,255,0.03); }
+.block { position: absolute; height: 22px; border-radius: 5px; }
+.head { position: absolute; top: 46px; width: 3px; height: 258px; background: #39ff14; box-shadow: 0 0 10px #39ff14; }
+.glow { position: absolute; left: -100px; top: -60px; width: 1020px; height: 440px; background: radial-gradient(closest-side, var(--c), transparent); }
+.msg { position: absolute; left: 22px; width: 330px; font-size: 26px; line-height: 36px; }
+.msg small { display: block; font-size: 22px; letter-spacing: 0.12em; margin-bottom: 6px; }
+.you { padding: 16px 18px; border-radius: 10px; background: rgba(199,125,255,0.14); border: 1px solid rgba(199,125,255,0.4); }
+.you small { color: #c77dff; }
+.bot small { color: #ff2d95; }
+</style>
+<div class="stage" id="stage">
+  <div class="top">
+    <div class="brand" id="brand">PURPLE</div>
+    <div class="title" id="title">Night Shift</div>
+    <div class="bpm" id="bpm">120 bpm</div>
+    <div class="play" id="play"></div>
+  </div>
+  <div class="pane" id="editor" style="left:32px;top:96px;width:820px;height:340px">
+    <div class="flashline" id="flash"></div>
+    <div class="code" id="code"></div>
+  </div>
+  <div class="pane" id="out" style="left:32px;top:456px;width:820px;height:320px">
+    <div class="glow" id="glow"></div>
+    <div class="lbl" style="left:24px;top:12px">OUTPUT</div>
+    <div id="grid"></div>
+    <div class="lane" id="lane"></div>
+    <div class="head" id="playhead"></div>
+  </div>
+  <div class="pane" id="agent" style="left:872px;top:96px;width:376px;height:680px">
+    <div class="lbl" style="left:22px;top:20px">AGENT</div>
+    <div class="lbl" id="mcp" style="left:150px;top:20px;color:#39ff14">● MCP</div>
+    <div class="msg you" id="you" style="top:84px"><small>YOU</small>make it darker, add a bassline</div>
+    <div class="msg bot" id="bot" style="top:268px"><small>AGENT</small>Swapping the lead for a sawtooth bass on C2, low-pass at 600&nbsp;Hz.</div>
+    <div class="msg bot" id="done" style="top:500px"><small style="color:#39ff14">✓ PATTERN UPDATED</small>Bass comes in on the downbeat.</div>
+  </div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 12.5;
+window.POSTER = 9.0;
+
+const $ = (id) => document.getElementById(id);
+
+// 120 bpm: a beat every 0.5 s, a sixteenth every 0.125 s, a bar (one Strudel
+// cycle at cpm(30)) every 2 s. Playback starts on a bar line, and the edited
+// pattern takes over on a later bar line.
+const PLAY = 2.0, STEP = 0.125, SWITCH = 8.0;
+const DRUMS = { bd: [0, 4, 8, 12], cp: [4, 12], hh: [0, 2, 4, 6, 8, 10, 12, 14] };
+// [step, length, midi, token]
+const LEAD = [[0, 4, 60, "c4"], [4, 4, 63, "eb4"], [8, 4, 67, "g4"], [12, 4, 70, "bb4"]];
+const BASS = [[0, 4, 36, "c2"], [6, 2, 36, "c2b"], [8, 4, 39, "eb2"], [12, 4, 31, "g1"]];
+const LILAC = [199, 125, 255], PINK = [255, 45, 149];
+const rgba = ([r, g, b], a) => `rgba(${r},${g},${b},${a})`;
+
+// Seconds since the latest hit of `steps` at time t, or Infinity.
+const since = (steps, t) => {
+  if (t < PLAY) return Infinity;
+  const n = Math.floor((t - PLAY) / STEP + 1e-6);
+  for (let i = n; i > n - 16; i--) if (steps.includes(((i % 16) + 16) % 16)) return t - (PLAY + i * STEP);
+  return Infinity;
+};
+const hit = (steps, t, len = 0.22) => clamp(1 - since(steps, t) / len);
+const notesAt = (t) => (t >= SWITCH ? BASS : LEAD);
+// The note sounding at t, and how far into it we are.
+const sounding = (t) => {
+  if (t < PLAY) return null;
+  const s = (((t - PLAY) / STEP) % 16 + 16) % 16;
+  return notesAt(t).find(([at, len]) => s >= at && s < at + len) ?? null;
+};
+
+// The drum rows and the note lane.
+const ROWS = ["bd", "cp", "hh"];
+const X0 = 108, PITCH = 43;
+const cells = ROWS.map((name, r) => {
+  const label = document.createElement("div");
+  label.className = "row";
+  label.style.top = `${52 + r * 48}px`;
+  label.textContent = name;
+  $("grid").append(label);
+  return Array.from({ length: 16 }, (_, i) => {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.style.left = `${X0 + i * PITCH}px`;
+    cell.style.top = `${50 + r * 48}px`;
+    $("grid").append(cell);
+    return cell;
+  });
+});
+const laneLabel = document.createElement("div");
+laneLabel.className = "row";
+laneLabel.style.top = "232px";
+$("grid").append(laneLabel);
+const blocks = LEAD.map(() => {
+  const b = document.createElement("div");
+  b.className = "block";
+  $("lane").append(b);
+  return b;
+});
+
+// The code, token by token, with the parts the agent rewrites.
+const OLD_NOTES = "c4 eb4 g4 bb4", NEW_NOTES = "c2 [~ c2] eb2 g1";
+// The same strings as [text, the note it names], so each name can light.
+const LEAD_TEXT = [["c4", "c4"], [" "], ["eb4", "eb4"], [" "], ["g4", "g4"], [" "], ["bb4", "bb4"]];
+const BASS_TEXT = [["c2", "c2"], [" [~ "], ["c2", "c2b"], ["] "], ["eb2", "eb2"], [" "], ["g1", "g1"]];
+const E = { del1: 5.9, type1: 6.3, del2: 7.0, type2: 7.25, type3: 7.6 };
+const TYPE = 0.04, DEL = 0.025;
+const notesText = (t) => {
+  if (t < E.del1) return OLD_NOTES;
+  if (t < E.type1) return OLD_NOTES.slice(0, Math.max(0, OLD_NOTES.length - Math.floor((t - E.del1) / DEL)));
+  return typed(NEW_NOTES, t, E.type1, TYPE);
+};
+const synthText = (t) => {
+  if (t < E.del2) return "triangle";
+  if (t < E.type2) return "triangle".slice(0, Math.max(0, 8 - Math.floor((t - E.del2) / DEL)));
+  return typed("sawtooth", t, E.type2, TYPE);
+};
+const editing = (t) => t >= E.del1 && t < E.type3 + 9 * TYPE + 0.15;
+
+window.render = (t) => {
+  cycleFade($("stage"), t, CYCLE, 0.6);
+  const switched = t >= SWITCH;
+  const tone = switched ? PINK : LILAC;
+  const swap = progress(t, SWITCH, 0.5);
+
+  ["brand", "title", "bpm", "play"].forEach((id, i) => appear($(id), progress(t, 0.15 + i * 0.08, 0.7)));
+  ["editor", "out", "agent"].forEach((id, i) => appear($(id), progress(t, 0.3 + i * 0.09, 0.8), 16));
+
+  // Play: pressed just before the first bar, then a lit key that beats.
+  const playing = t >= PLAY - 0.1;
+  const beat = hit([0, 4, 8, 12], t, 0.3);
+  $("play").textContent = playing ? "● PLAYING" : "▶ PLAY";
+  $("play").style.background = playing ? `rgba(57,255,20,${0.16 + 0.22 * beat})` : "#1f6b10";
+  $("play").style.color = playing ? "#39ff14" : "#eaffdf";
+  $("play").style.boxShadow = playing ? `0 0 ${24 * beat}px rgba(57,255,20,0.6)` : "none";
+  $("play").style.transform = `scale(${track([[PLAY - 0.3, 1], [PLAY - 0.2, 0.92], [PLAY, 1]], t)})`;
+
+  // Strudel lights a token while its event sounds.
+  const lit = (text, k, color = tone) => k > 0
+    ? `<span class="tok" style="background:${rgba(color, 0.18 + 0.4 * k)};box-shadow:0 0 0 2px ${rgba(color, 0.4 + 0.6 * k)}">${text}</span>`
+    : text;
+  const note = sounding(t);
+  // A note is brightest as it starts and settles while it holds.
+  const noteK = note ? 1 - 0.5 * clamp((((t - PLAY) / STEP) % 16 - note[0]) * STEP / 0.3) : 0;
+  const quiet = editing(t);
+  const notes = quiet
+    ? notesText(t)
+    : (switched ? BASS_TEXT : LEAD_TEXT).map(([text, key]) => (key ? lit(text, note && note[3] === key ? noteK : 0) : text)).join("");
+  const caret = (on) => (on && Math.floor(t * 4) % 2 === 0 ? '<span class="edit"></span>' : on ? '<span class="edit" style="opacity:0.5"></span>' : "");
+  const atNotes = t >= E.del1 && t < E.del2;
+  const atSynth = t >= E.del2 && t < E.type3 + 9 * TYPE + 0.15;
+  const suffix = t >= E.type3 ? typed(".lpf(600)", t, E.type3, TYPE) : "";
+  const lpf = suffix.length === 9 ? `.<span class="fn">lpf</span>(<span class="num">600</span>)` : suffix;
+  const L = (n, html) => `<span class="ln">${n}</span>${html}`;
+  $("code").innerHTML = [
+    L(1, `<span class="fn">stack</span>(`),
+    L(2, `  <span class="fn">s</span>(<span class="str">"${lit("bd", hit(DRUMS.bd, t))}*4, [~ ${lit("cp", hit(DRUMS.cp, t))}]*2, ${lit("hh", hit(DRUMS.hh, t, 0.16))}*8"</span>),`),
+    L(3, `  <span class="fn">note</span>(<span class="str">"${notes}${caret(atNotes)}"</span>)`),
+    L(4, `    .<span class="fn">s</span>(<span class="str">"${synthText(t)}"</span>)${lpf}${caret(atSynth)}`),
+    L(5, `).<span class="fn">cpm</span>(<span class="num">30</span>)`),
+  ].join("\n");
+  // Evaluating the edit flashes the lines it changed.
+  const flash = progress(t, SWITCH - 0.05, 0.05) * (1 - progress(t, SWITCH, 0.6));
+  $("flash").style.top = `${18 + 2 * 56}px`;
+  $("flash").style.opacity = 0.35 * flash;
+  $("flash").style.background = rgba(PINK, 1);
+
+  // The output: drum cells flash on their hits; notes ride the lane.
+  ROWS.forEach((name, r) => cells[r].forEach((cell, i) => {
+    const on = DRUMS[name].includes(i);
+    const k = on ? hit([i], t, name === "hh" ? 0.2 : 0.32) : 0;
+    cell.style.background = on ? rgba(tone, 0.22 + 0.78 * k) : "rgba(255,255,255,0.04)";
+    cell.style.boxShadow = k > 0 ? `0 0 ${18 * k}px ${rgba(tone, 0.8)}` : "none";
+    cell.style.transform = `scale(${1 + 0.12 * k})`;
+  }));
+  laneLabel.textContent = switched ? "bass" : "lead";
+  laneLabel.style.color = switched ? rgba(PINK, 1) : "rgba(230,225,242,0.6)";
+  const set = notesAt(t);
+  blocks.forEach((b, i) => {
+    const [at, len, midi, key] = set[i];
+    const y = 104 - 14 - ((midi - 28) / (74 - 28)) * (104 - 28);
+    const on = note && note[3] === key;
+    const h = switched ? 34 : 14;
+    b.style.left = `${at * PITCH + 2}px`;
+    b.style.width = `${len * PITCH - 6}px`;
+    b.style.top = `${y - h / 2}px`;
+    b.style.height = `${h}px`;
+    b.style.background = rgba(tone, on ? 0.95 : 0.3);
+    b.style.boxShadow = on ? `0 0 ${switched ? 26 : 14}px ${rgba(tone, 0.8)}` : "none";
+    b.style.opacity = swap < 1 && switched ? swap : 1;
+  });
+  const bar = t >= PLAY ? (((t - PLAY) / 2) % 1) : 0;
+  $("playhead").style.left = `${X0 + bar * 16 * PITCH - 4}px`;
+  $("playhead").style.opacity = t >= PLAY ? 1 : 0;
+  // The room breathes with the kick, and much harder once the bass is in.
+  const kick = hit(DRUMS.bd, t, switched ? 0.45 : 0.3);
+  $("glow").style.setProperty("--c", rgba(tone, switched ? 0.5 : 0.22));
+  $("glow").style.opacity = kick;
+  $("out").style.background = switched ? `rgba(40,10,32,${0.45 + 0.25 * swap})` : "rgba(34,26,51,0.45)";
+
+  // The request comes in over MCP; the agent answers and edits.
+  appear($("you"), progress(t, 4.3, 0.7));
+  appear($("bot"), progress(t, 5.2, 0.7));
+  appear($("done"), progress(t, SWITCH, 0.7));
+  // The MCP light blinks as each message crosses it.
+  const blink = Math.max(...[4.3, 5.2, SWITCH].map((at) => progress(t, at, 0.1) * (1 - progress(t, at + 0.1, 0.5))));
+  $("mcp").style.opacity = 0.55 + 0.45 * blink;
+  $("mcp").style.textShadow = `0 0 ${12 * blink}px #39ff14`;
+};
+render(window.POSTER);
+</script>

@@ -16,11 +16,19 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   `- [label](url): blurb` line; a blurb ending in a parenthetical such as `(coming soon)` renders
   it as a tag beside the name. Entries in the project list sit under `### ` group headings,
   which become the labels on the page; entries above any group heading are labelled with
-  the section's own heading. `{projects}` in any frontmatter value is
-  replaced with the project names. A missing section fails the build.
+  the section's own heading; the section's heading is the homepage's headline. `{projects}`
+  in any frontmatter value is replaced with the project names. A missing section fails the build.
+  Each entry is a card in a gallery, showing `public/img/work/<slug>.webp` (slug: the label
+  lowercased, runs of other characters as `-`) and, when present, the looping clip
+  `<slug>.mp4` with that picture as its poster.
+- `motion/<slug>.html` — a project's clip as a scene: a 1280×800 stage whose `render(t)` sets
+  everything from the time alone (helpers in `motion/lib.js`, model in `motion/keep-going.html`).
+  `pnpm motion [slug]` records scenes with a headless Chromium into `public/img/work/`; like the
+  share cards, the clips are tracked. Scenes hold invented sample content only: never a real
+  person, address, file, message or location.
 - `content/<slug>.md` — any other file is a page served at `/<slug>` (and `/<slug>.md`), with
   `title` and `description` frontmatter and a body in plain markdown: headings, paragraphs,
-  bullet lists, fenced code, images on their own line (PNG or lossless WebP under `public/img/`,
+  bullet lists, fenced code, images on their own line (PNG or WebP under `public/img/`,
   sized at build time), inline code and links. Blocks are separated by blank lines. A heading
   ending in `{#id}` gets that id, for links to a section.
 - `scripts/build.js` — renders all generated public representations: the pages, their markdown
@@ -33,7 +41,9 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   a hash of what the card shows: after a new page, title, description or first screenshot,
   the build fails until you run `pnpm cards` and commit `public/img/og/`.
 - `public/favicon.svg`, `public/favicon.ico` (the same sun for Safari, which asks for it by name) and
-  `public/img/` (with the drawn share cards in `public/img/og/`) — the tracked static assets
+  `public/img/` (with the drawn share cards in `public/img/og/` and the recorded project
+  pictures and clips in `public/img/work/`) and `public/fonts/` (Geist and Geist Mono, OFL) —
+  the tracked static assets
 - `public/_redirects` — each project's `/<slug>/install.sh` to the install script attached to that project's latest release,
   and retired page paths to where their content moved
 - `cloudflare.config.ts` — Worker settings (name, compatibility date); `wrangler.config.ts` — asset directory and build command
@@ -47,6 +57,7 @@ edit them directly.
 ```sh
 pnpm build
 pnpm cards   # redraw share cards, then build
+pnpm motion  # record project clips from motion/ (or: pnpm motion <slug>)
 pnpm dev
 ```
 

@@ -1,0 +1,173 @@
+<!doctype html>
+<!-- slop-detector: the extension reads down an AI-flavoured article and
+     red-pens each tell, the toolbar badge counting; its popup stamps the
+     text CERTIFIED SLOP, then a plain human note READS HUMAN. -->
+<meta charset="utf-8">
+<style>
+@font-face { font-family: "Geist Mono"; src: url("../public/fonts/GeistMono-Variable.woff2"); font-weight: 100 900; }
+@font-face { font-family: "Geist"; src: url("../public/fonts/Geist-Variable.woff2"); font-weight: 100 900; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; background: #000; }
+.stage { position: absolute; inset: 0; background: #0b0c12; font-family: "Geist", sans-serif; color: #23241f; }
+.window { position: absolute; left: 40px; top: 40px; width: 1200px; height: 720px; border-radius: 20px; background: #fdfcf8; overflow: hidden; }
+.toolbar { position: relative; height: 76px; display: flex; align-items: center; gap: 18px; padding: 0 22px; background: #e9e6dd; border-bottom: 1px solid #d6d2c6; }
+.toolbar > i { width: 14px; height: 14px; border-radius: 50%; background: #c9c4b6; }
+.url { flex: 1; height: 46px; margin-left: 14px; border-radius: 23px; background: #fdfcf8; display: flex; align-items: center; padding: 0 22px; font-size: 24px; color: #6b6a62; }
+.ext { position: relative; width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.ext svg { width: 40px; height: 40px; }
+.badge { position: absolute; right: -14px; bottom: -8px; min-width: 38px; height: 34px; padding: 0 8px; border-radius: 17px; background: #c42b1f; color: #fff; font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #e9e6dd; }
+
+.article { position: absolute; left: 90px; top: 116px; width: 1020px; }
+.mast { font-size: 20px; font-weight: 700; letter-spacing: 0.3em; color: #55564f; }
+h1 { margin: 14px 0 6px; font-size: 48px; line-height: 1.1; letter-spacing: -0.02em; }
+.by { font-size: 24px; color: #7a7970; }
+.body { margin-top: 26px; }
+.body p { margin: 0 0 22px; font-size: 33px; line-height: 1.5; }
+.m { position: relative; white-space: nowrap; }
+.m .flash { position: absolute; left: -3px; right: -3px; top: 4px; bottom: 2px; border-radius: 4px; background: #c42b1f; }
+.m .wave { position: absolute; left: 0; right: 0; bottom: -6px; height: 10px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10'%3E%3Cpath d='M0 5 Q4 0 8 5 T16 5' fill='none' stroke='%23C42B1F' stroke-width='3'/%3E%3C/svg%3E") repeat-x; }
+.scan { position: absolute; left: 70px; width: 1060px; height: 4px; border-radius: 2px; background: #c42b1f; box-shadow: 0 0 24px 6px rgba(196, 43, 31, 0.25); }
+
+/* The popup, as the extension draws it: paper, ink border, typewriter mono. */
+.popup { position: absolute; left: 576px; top: 104px; width: 644px; padding: 24px 26px 26px; background: #f6f4ee; border: 2px solid #23241f; border-radius: 6px; box-shadow: 8px 8px 0 #23241f; font-family: "Geist Mono", monospace; transform-origin: 92% 0; }
+.popup header { display: flex; align-items: baseline; gap: 16px; white-space: nowrap; }
+.popup h2 { margin: 0; font-size: 30px; letter-spacing: 0.06em; }
+.popup header small { font-size: 22px; color: #55564f; }
+.text { margin-top: 18px; height: 238px; padding: 14px 16px; background: #fff; border: 2px solid #23241f; border-radius: 4px; font-size: 25px; line-height: 1.55; white-space: pre-wrap; overflow: hidden; }
+.text mark { background: #f9e27d; border-bottom: 3px solid #c42b1f; color: inherit; }
+.bar { display: flex; align-items: center; gap: 16px; white-space: nowrap; margin-top: 20px; height: 70px; }
+.run { padding: 14px 18px; border-radius: 4px; background: #23241f; color: #f6f4ee; font-size: 21px; font-weight: 700; letter-spacing: 0.08em; }
+.stamp { padding: 8px 14px; border: 5px double; border-radius: 4px; font-size: 29px; font-weight: 800; letter-spacing: 0.08em; white-space: nowrap; }
+.score { font-size: 26px; font-weight: 700; color: #55564f; }
+.caret { display: inline-block; width: 12px; height: 28px; vertical-align: -5px; background: #23241f; }
+</style>
+<div class="stage" id="stage">
+  <div class="window">
+    <div class="toolbar">
+      <i></i><i></i><i></i>
+      <div class="url">weeklysignal.example/ai-at-work</div>
+      <div class="ext" id="ext">
+        <svg viewBox="0 0 40 40"><path d="M8 3h17l8 8v26H8z" fill="#f6f4ee" stroke="#23241f" stroke-width="2.6" stroke-linejoin="round"/><path d="M25 3v8h8" fill="none" stroke="#23241f" stroke-width="2.6" stroke-linejoin="round"/><path d="M13 15h14M13 20.5h14M13 26h10" stroke="#23241f" stroke-width="2.4"/><path d="M12 32q2.5-3 5 0t5 0t5 0" fill="none" stroke="#c42b1f" stroke-width="2.6"/></svg>
+        <span class="badge" id="badge"></span>
+      </div>
+    </div>
+    <div class="article" id="article">
+      <div class="mast">THE WEEKLY SIGNAL</div>
+      <h1>Why AI is changing how we work</h1>
+      <div class="by">By Jordan Hale · 4 min read</div>
+      <div class="body" id="body"></div>
+    </div>
+    <div class="scan" id="scan"></div>
+  </div>
+  <div class="popup" id="popup">
+    <header><h2>SLOP DETECTOR</h2><small>red-pen lint for prose</small></header>
+    <div class="text" id="text"></div>
+    <div class="bar"><span class="run" id="run">RUN CHECK</span><span class="stamp" id="stamp"></span><span class="score" id="score"></span></div>
+  </div>
+</div>
+<script src="lib.js"></script>
+<script>
+window.CYCLE = 13;
+window.POSTER = 7.4;
+
+const $ = (id) => document.getElementById(id);
+// [brackets] mark what the rules catch.
+const PARAGRAPHS = [
+  "[In today's fast-paced world], AI [marks a pivotal moment] for teams. [It's not just a tool, it's a shift].",
+  "[Let's delve into] the [rich tapestry] of new workflows that [seamlessly] [elevate] how we work.",
+  "[In conclusion], [it's important to note] that [the future looks bright].",
+];
+const HUMAN = "Took the 8:10 train, wrote the report by lunch, then swam forty lengths. Good day.";
+
+$("body").innerHTML = PARAGRAPHS.map((p) => `<p>${p.replace(/\[([^\]]+)\]/g, '<span class="m"><span class="flash"></span>$1<span class="wave"></span></span>')}</p>`).join("");
+const marks = [...document.querySelectorAll(".m")];
+
+// The scan line reads top to bottom; each tell is caught as the line reaches
+// it, a little later the further right it sits. Offsets ignore transforms, and
+// are read on the first render, once the fonts have loaded.
+const SCAN = [1.7, 5.3];
+const ARTICLE = { left: 90, top: 116 };
+let TOP, BOTTOM, FOUND;
+const measure = () => {
+  const article = $("article");
+  TOP = ARTICLE.top + $("body").offsetTop - 10;
+  BOTTOM = ARTICLE.top + article.offsetHeight;
+  FOUND = marks.map((m) => {
+    const y = ARTICLE.top + m.offsetTop + m.offsetHeight;
+    return SCAN[0] + ((y - TOP) / (BOTTOM - TOP)) * (SCAN[1] - SCAN[0]) + m.offsetLeft / 4000;
+  });
+};
+const scanY = (t) => TOP + (BOTTOM - TOP) * clamp((t - SCAN[0]) / (SCAN[1] - SCAN[0]));
+
+// The popup checks the first paragraph, then a plain note.
+const SLOP_TEXT = PARAGRAPHS[0].replace(/\[([^\]]+)\]/g, "<mark>$1</mark>");
+const RUNS = [
+  { press: 6.3, label: "CERTIFIED SLOP", color: "#c42b1f", score: 92 },
+  { press: 10.4, label: "READS HUMAN", color: "#2e6b34", score: 4 },
+];
+const TYPE = [8.6, 0.022];
+
+window.render = (t) => {
+  if (!FOUND) measure();
+  cycleFade($("stage"), t, CYCLE);
+  appear($("article"), progress(t, 0.3, 0.9));
+
+  // Scan and underline.
+  $("scan").style.opacity = Math.min(progress(t, SCAN[0] - 0.2, 0.2), 1 - progress(t, SCAN[1], 0.3));
+  $("scan").style.transform = `translateY(${scanY(t)}px)`;
+  marks.forEach((m, i) => {
+    const k = progress(t, FOUND[i], 0.4, easeInOut);
+    m.querySelector(".wave").style.clipPath = `inset(0 ${(1 - k) * 100}% 0 0)`;
+    const f = t >= FOUND[i] ? Math.max(0, 1 - (t - FOUND[i]) / 0.6) : 0;
+    m.querySelector(".flash").style.opacity = 0.22 * f;
+  });
+
+  // The toolbar badge counts what the page holds.
+  const found = FOUND.filter((f) => t >= f).length;
+  const badge = $("badge");
+  badge.textContent = found;
+  badge.style.opacity = found ? 1 : 0;
+  const last = Math.max(...FOUND.filter((f) => t >= f), -9);
+  const bump = t - last < 0.3 ? Math.sin(((t - last) / 0.3) * Math.PI) : 0;
+  badge.style.transform = `scale(${1 + 0.3 * bump})`;
+  $("ext").style.background = t >= 5.5 && t < 6.0 ? "#d6d2c6" : "transparent";
+
+  // The popup opens from the icon.
+  const pop = progress(t, 5.6, 0.6);
+  const popup = $("popup");
+  popup.style.opacity = pop;
+  popup.style.transform = `translateY(${(1 - pop) * -14}px) scale(${0.96 + 0.04 * pop})`;
+  popup.style.filter = pop >= 1 ? "none" : `blur(${(1 - pop) * 4}px)`;
+
+  // First the article's opening, then a plain note typed over it.
+  let text;
+  if (t < TYPE[0] - 0.4) {
+    text = t >= RUNS[0].press ? SLOP_TEXT : PARAGRAPHS[0].replace(/[\[\]]/g, "");
+    $("text").style.opacity = 1 - progress(t, TYPE[0] - 0.6, 0.2);
+  } else {
+    const typedText = typed(HUMAN, t, TYPE[0], TYPE[1]);
+    const typing = typedText.length < HUMAN.length;
+    text = typedText + (typing || Math.floor(t * 2) % 2 === 0 && t < RUNS[1].press ? '<span class="caret"></span>' : "");
+    $("text").style.opacity = 1;
+  }
+  $("text").innerHTML = text;
+
+  // RUN CHECK, then the stamp lands and the score counts.
+  const r = RUNS[t >= RUNS[1].press - 0.3 ? 1 : 0];
+  const down = t >= r.press && t < r.press + 0.15;
+  $("run").style.transform = down ? "translateY(3px)" : "none";
+  $("run").style.background = down ? "#000" : "#23241f";
+  const hide = r === RUNS[0] ? 1 - progress(t, TYPE[0] - 0.6, 0.2) : 1;
+  const s = progress(t, r.press + 0.2, 0.45);
+  const stamp = $("stamp");
+  stamp.textContent = r.label;
+  stamp.style.color = r.color;
+  stamp.style.borderColor = r.color;
+  stamp.style.opacity = Math.min(s, hide) * (t >= r.press + 0.2 ? 1 : 0);
+  stamp.style.transform = `rotate(-4deg) scale(${1.6 - 0.6 * s})`;
+  const score = Math.round(r.score * progress(t, r.press + 0.3, 0.7, easeInOut));
+  $("score").textContent = `${score}/100`;
+  $("score").style.opacity = Math.min(progress(t, r.press + 0.3, 0.3), hide);
+};
+document.fonts.ready.then(() => { FOUND = null; render(window.POSTER); });
+</script>
