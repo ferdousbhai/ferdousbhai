@@ -1,13 +1,13 @@
 ---
-title: Ferdous' software projects
+title: Ferdous Bhai's kitchen
 name: Ferdous Bhai
 description: Ferdous Bhai makes Omarchy software, web apps, Chrome extensions and agent tools.
 summary: Personal site of Ferdous. Software projects: {projects}.
 ---
 
-# Ferdous' software projects
+# Ferdous Bhai's kitchen
 
-## Software projects
+## What I'm cooking now
 
 ### Omarchy
 

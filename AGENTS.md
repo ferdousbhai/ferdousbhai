@@ -1,8 +1,13 @@
 # ferdousbhai.com
 
-Small site on Cloudflare Workers static assets: no Worker script, no client-side JavaScript,
-no web font, no runtime dependencies. Agents read it through llms.txt and the markdown twins;
-there is no WebMCP, as there is no JavaScript to register tools with.
+Personal site on Cloudflare Workers static assets, no Worker script. Work published here
+can be any form (apps, extensions, agentic tools, infographics, video), so pages may use
+client-side JavaScript and web fonts. Both are served from this origin: the Content Security
+Policy allows scripts and fonts from `'self'` only, so vendor a library or font under `public/`
+rather than linking a CDN. Agents read the site through llms.txt and the markdown twins.
+
+Design work follows the skills in `.claude/skills/` (`landing-page-design`,
+`redesign-existing-projects`, `design-to-motion`).
 
 ## Code index
 
