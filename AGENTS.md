@@ -1,6 +1,6 @@
 # ferdousbhai.com
 
-Personal site on Cloudflare Workers static assets, no Worker script. Work published here
+Personal site on Cloudflare Workers static assets. Work published here
 can be any form (apps, extensions, agentic tools, infographics, video), so pages may use
 client-side JavaScript and web fonts. Both are served from this origin: the Content Security
 Policy allows scripts and fonts from `'self'` only, so vendor a library or font under `public/`
@@ -46,7 +46,11 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   the tracked static assets
 - `public/_redirects` — each project's `/<slug>/install.sh` to the install script attached to that project's latest release,
   and retired page paths to where their content moved
-- `cloudflare.config.ts` — Worker settings (name, compatibility date); `wrangler.config.ts` — asset directory and build command
+- `src/worker.js` — the only script, run for `/img/work/*.mp4` alone: static assets are served
+  without byte ranges, and Safari plays video only from a server that answers a Range request
+  with 206, so it slices the clip. Everything else is served by the assets directly.
+- `cloudflare.config.ts` — Worker settings (name, compatibility date, the script, which paths run
+  it first); `wrangler.config.ts` — asset directory and build command
 
 Generated and gitignored outputs are every `public/*.html` and `public/*.md`, `public/llms.txt`,
 `public/llms-full.txt`, `public/robots.txt`, `public/sitemap.xml`, and `public/_headers`. Do not

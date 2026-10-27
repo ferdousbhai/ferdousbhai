@@ -11,7 +11,8 @@ export default defineWranglerConfig({
 	types: {
 		generate: false,
 	},
-	// No Worker script: every request is answered straight from these files,
-	// with public/_headers and public/_redirects supplying the rest.
+	// Requests are answered straight from these files, with public/_headers and
+	// public/_redirects supplying the rest; only the project clips pass through
+	// src/worker.js first (see cloudflare.config.ts).
 	assetsDirectory: "./public",
 });
