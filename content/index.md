@@ -7,7 +7,7 @@ summary: Personal site of Ferdous. Software projects: {projects}.
 
 # Ferdous Bhai's kitchen
 
-## What I'm cooking now
+## What I'm cooking
 
 ### Omarchy
 

@@ -311,10 +311,10 @@ a.bar__name:hover { color: var(--accent); }
 .group + .group { margin-top: 32px; }
 .group__label {
   margin: 0 0 12px;
-  color: var(--dim);
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 500;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
 }
 .work {
   list-style: none;
