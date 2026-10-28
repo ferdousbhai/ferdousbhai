@@ -53,7 +53,8 @@ const parseLinks = (text) =>
 // first one form a group labelled with the section's own heading. Too few
 // sections throws at the first use of the missing one.
 const firstLine = (text) => text.slice(0, text.indexOf("\n")).trim();
-const parseGroup = (text) => ({ heading: firstLine(text), links: parseLinks(text) });
+const slugOf = (label) => label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const parseGroup = (text) => ({ heading: firstLine(text), slug: slugOf(firstLine(text)), links: parseLinks(text) });
 const sections = markdown
   .split(/^## /m)
   .slice(1)
@@ -98,7 +99,6 @@ const imageSize = (src) => {
 // beside it <slug>.mp4 when the project has a clip (drawn from motion/<slug>.html
 // by `pnpm motion`). The clip loops silently; the picture is its poster, and
 // stands in for it for readers who ask for less motion.
-const slugOf = (label) => label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const mediaHtml = (label) => {
   const base = `/img/work/${slugOf(label)}`;
   const hasClip = existsSync(`${publicDir}${base.slice(1)}.mp4`);
@@ -126,17 +126,30 @@ const projectHtml = ({ label, url, blurb, tag }) => {
       </li>`;
 };
 
-// The headline, then each group as its label and its entries; the label is the
-// group's heading.
-const projectGroupsHtml = `      <h1 class="headline">${escapeHtml(work.heading)}</h1>\n` + work.groups
+// The headline, a row of chips that filter the gallery to one group, then each
+// group as its label and its entries; the label is the group's heading. The
+// chips are radio buttons, so the filtering needs no script.
+const chipHtml = (value, label, checked = false) =>
+  `        <label class="chip"><input type="radio" name="group" value="${value}"${checked ? " checked" : ""}><span>${escapeHtml(label)}</span></label>`;
+const projectGroupsHtml = `      <h1 class="headline">${escapeHtml(work.heading)}</h1>
+      <div class="chips" role="radiogroup" aria-label="Show">
+${[chipHtml("all", "All", true), ...work.groups.map(({ heading, slug }) => chipHtml(slug, heading))].join("\n")}
+      </div>
+      <div class="gallery">
+${work.groups
   .map(
-    ({ heading, links }) => `      <section class="group">
+    ({ heading, slug, links }) => `      <section class="group" data-group="${slug}">
       <h2 class="group__label">${escapeHtml(heading)}</h2>
       <ul class="work">
 ${links.map(projectHtml).join("\n")}
       </ul>
       </section>`,
   )
+  .join("\n")}
+      </div>`;
+// A checked chip hides every group but its own.
+const chipStylesheet = work.groups
+  .map(({ slug }) => `.stage:has(.chip input[value="${slug}"]:checked) .group:not([data-group="${slug}"]) { display: none; }`)
   .join("\n");
 
 const contactLinksHtml = contact.links
@@ -198,8 +211,10 @@ const renderMarkdown = (source) => {
   return html.join("\n");
 };
 
+const minifyCss = (css) => css.replace(/\s*\/\*[\s\S]*?\*\//g, "").replace(/\n\s*/g, "\n");
+
 // Comments and indentation stay here; the page gets the rules alone.
-const stylesheet = `
+const stylesheet = minifyCss(`
 /* Geist for everything, Geist Mono for code and tags; both served from here
    (public/fonts, under the OFL), as the CSP takes fonts from this origin only. */
 @font-face {
@@ -246,18 +261,19 @@ body {
 }
 ::selection { background: var(--accent); color: var(--bg); }
 a { color: inherit; text-decoration: none; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+:focus-visible, .chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
 h1, h2 { text-wrap: balance; }
 p { text-wrap: pretty; }
 
 .frame {
+  --gutter: 16px;
   flex: 1;
   max-width: 64rem;
   display: flex;
   flex-direction: column;
 }
 
-.bar, .stage, .foot { padding-inline: 16px; }
+.bar, .stage, .foot { padding-inline: var(--gutter); }
 .bar, .foot {
   display: flex;
   align-items: center;
@@ -295,6 +311,7 @@ a.bar__name:hover { color: var(--accent); }
   flex: 1;
   display: grid;
   align-content: start;
+  grid-template-columns: minmax(0, 1fr);
   row-gap: 16px;
   padding-block: 16px 48px;
 }
@@ -305,89 +322,6 @@ a.bar__name:hover { color: var(--accent); }
   line-height: 2.5rem;
   font-weight: 600;
   letter-spacing: -0.025em;
-}
-
-/* A group is its label over a gallery of cards, two to a row. */
-.group + .group { margin-top: 32px; }
-.group__label {
-  margin: 0 0 12px;
-  color: var(--ink);
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 600;
-}
-.work {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-/* Each card is a shade, no border, with its picture or clip inset 8px; the
-   picture's corners are the card's less that gap. */
-.work__link {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 8px 8px 24px;
-  border-radius: 16px;
-  background: var(--surface);
-}
-.work__link:hover { background: var(--line); }
-.work__link:active { transform: scale(0.99); }
-.work__media {
-  display: block;
-  margin-bottom: 16px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--bg);
-}
-.work__media video, .work__media img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.work__media--clip img { display: none; }
-.work__text {
-  display: block;
-  padding: 0 12px;
-}
-.work__name {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-/* On hover the name turns gold and an arrow slides in: across for a page here,
-   up and out for another site. */
-.work__name::after {
-  content: " →";
-  display: inline-block;
-  opacity: 0;
-  transform: translateX(-4px);
-}
-.work__link:not([href^="https://ferdousbhai.com"]) .work__name::after { content: " ↗"; }
-.work__link:hover .work__name,
-.work__link:focus-visible .work__name { color: var(--accent); }
-.work__link:hover .work__name::after,
-.work__link:focus-visible .work__name::after { opacity: 1; transform: none; }
-.work__tag {
-  margin-left: 8px;
-  padding: 2px 8px;
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  border-radius: 4px;
-  color: var(--accent);
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  line-height: 1rem;
-  vertical-align: 2px;
-}
-.work__blurb {
-  display: block;
-  margin-top: 4px;
-  color: var(--dim);
-  text-wrap: pretty;
 }
 
 /* A page: one column of prose in the same frame. */
@@ -458,25 +392,15 @@ a.bar__name:hover { color: var(--accent); }
 
 /* Movement only for readers who have not asked for less of it. */
 @media (prefers-reduced-motion: no-preference) {
-  .work__link, .work__name, .work__name::after, .foot a, .bar__name, .doc a {
+  .work__link, .work__name, .work__name::after, .foot a, .bar__name, .doc a, .chip span {
     transition: color 300ms var(--ease), background-color 300ms var(--ease), opacity 300ms var(--ease), transform 300ms var(--ease), text-decoration-color 300ms var(--ease);
   }
 }
-/* For readers who ask for less motion, the clip gives way to its still. */
-@media (prefers-reduced-motion: reduce) {
-  .work__media--clip video { display: none; }
-  .work__media--clip img { display: block; }
-}
-
 @media (min-width: 40rem) {
   body { padding: 16px; }
-  .bar, .stage, .foot { padding-inline: 40px; }
+  .frame { --gutter: 40px; }
   .headline { font-size: 3rem; line-height: 1; }
   .doc h1 { font-size: 2.25rem; line-height: 2.5rem; }
-}
-
-@media (max-width: 56rem) {
-  .work { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* On a phone, one contact per line: whole-line tap targets instead of a
@@ -484,9 +408,149 @@ a.bar__name:hover { color: var(--accent); }
 @media (max-width: 40rem) {
   .foot { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
-`
-  .replace(/\s*\/\*[\s\S]*?\*\//g, "")
-  .replace(/\n\s*/g, "\n");
+`);
+
+// The homepage's gallery, inlined on the homepage alone: the other pages and the
+// share cards never show it, so its styles stay out of their bytes and out of
+// the cards' hashes.
+const galleryStylesheet = minifyCss(`
+.group__label {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+}
+.work { list-style: none; margin: 0; padding: 0; }
+/* Each card is a shade, no border, with its picture or clip inset 8px; the
+   picture's corners are the card's less that gap. */
+.work__link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 8px 8px 24px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+.work__link:hover, .chip:hover span { background: var(--line); }
+.work__link:active { transform: scale(0.99); }
+.work__media {
+  display: block;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
+}
+.work__media video, .work__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.work__media--clip img { display: none; }
+.work__text {
+  display: block;
+  padding: 0 12px;
+}
+.work__name {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+/* On hover the name turns gold and an arrow slides in: across for a page here,
+   up and out for another site. */
+.work__name::after {
+  content: " →";
+  display: inline-block;
+  opacity: 0;
+  transform: translateX(-4px);
+}
+.work__link:not([href^="https://ferdousbhai.com"]) .work__name::after { content: " ↗"; }
+.work__link:hover .work__name,
+.work__link:focus-visible .work__name { color: var(--accent); }
+.work__link:hover .work__name::after,
+.work__link:focus-visible .work__name::after { opacity: 1; transform: none; }
+.work__tag {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 4px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  vertical-align: 2px;
+}
+.work__blurb {
+  display: block;
+  margin-top: 4px;
+  color: var(--dim);
+  text-wrap: pretty;
+}
+
+/* For readers who ask for less motion, the clip gives way to its still. */
+@media (prefers-reduced-motion: reduce) {
+  .work__media--clip video { display: none; }
+  .work__media--clip img { display: block; }
+}
+
+/* On a phone or tablet each group is a shelf: its label over its cards in one
+   row that runs to the frame's edges and swipes sideways, the next card
+   showing at the edge to say there is more. */
+@media (width < 56rem) {
+  .chips { display: none; }
+  .group + .group { margin-top: 40px; }
+  .work {
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    display: flex;
+    gap: 12px;
+    scroll-padding-inline: var(--gutter);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .work > li { flex: none; width: min(85%, 26rem); scroll-snap-align: start; }
+}
+
+/* On a laptop the shelves fold into one grid, three to a row, under a row of
+   chips that narrow it to one group. The chips stand in for the labels, which
+   stay for screen readers as the page's outline. */
+@media (width >= 56rem) {
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .chip input, .group__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .chip span {
+    display: block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: var(--surface);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .chip input:checked + span { background: var(--ink); color: var(--bg); }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px 16px;
+  }
+  .group, .work { display: contents; }
+${chipStylesheet}
+}
+
+`);
 
 // Every route has a file stem: "/" is index, "/<slug>" is <slug>. The stem names
 // the html and markdown files and so the markdown twin's path.
@@ -519,7 +583,7 @@ const shell = ({ pageTitle, description, path, stageHtml, jsonLd, card }) => `<!
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preload" href="/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="alternate" type="text/markdown" href="${markdownPath(path)}">
-<style>${stylesheet}</style>${jsonLd ? `\n<script type="application/ld+json">\n${jsonLd}\n</script>` : ""}
+<style>${stylesheet}${pageTitle ? "" : galleryStylesheet}</style>${jsonLd ? `\n<script type="application/ld+json">\n${jsonLd}\n</script>` : ""}
 </head>
 <body>
   <div class="frame">
