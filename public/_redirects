@@ -1,8 +1,8 @@
 # The install one-liner on each project's page names this site, so the command
 # reads as ours and survives a repo move. Each script is an asset of that
 # project's latest release, the copy that release was verified with, not the
-# branch head behind GitHub's raw-file cache. Ghost installs from Omarchy's
-# package repository instead, so it has none.
+# branch head behind GitHub's raw-file cache. Ghost's own path is Omarchy's
+# package repository; its script installs the latest release ahead of it.
 /icloud-notes/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh 302
 /icloud-findmy/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh 302
 /icloud-photos/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh 302
@@ -11,6 +11,7 @@
 /icloud/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh 302
 /recall/install.sh https://github.com/ferdousbhai/recall-for-omarchy/releases/latest/download/install.sh 302
 /cloudmail/install.sh https://github.com/ferdousbhai/cloud-mail/releases/latest/download/install.sh 302
+/ghost/install.sh https://github.com/ferdousbhai/ghost/releases/latest/download/install.sh 302
 
 # iCloud Notes had its own page before the iCloud apps shared one; its old
 # address and markdown twin land on the Notes section of that page. These

@@ -13,7 +13,13 @@ An orchestration layer for your agent harnesses on [Omarchy](https://omarchy.org
 omarchy pkg add ghost
 ```
 
-Then [turn it on for your login](https://github.com/ferdousbhai/ghost/blob/master/docs/getting-started.md). You need at least one agent CLI; OpenCode's free models work without signing in.
+Then [turn it on for your login](https://github.com/ferdousbhai/ghost/blob/master/docs/getting-started.md).
+
+Omarchy's package repository can take a day to carry a new release. For the latest now, run this as yourself; it installs the same package and turns Ghost on, and `omarchy update` keeps it current afterwards:
+
+```sh
+curl -fsSL https://ferdousbhai.com/ghost/install.sh | bash
+``` You need at least one agent CLI; OpenCode's free models work without signing in.
 
 ## ghost-desktop {#desktop}
 
