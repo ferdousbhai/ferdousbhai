@@ -13,7 +13,7 @@ summary: Personal site of Ferdous. Software projects: {projects}.
 
 - [Recall](https://ferdousbhai.com/recall): Local semantic search for files, photos, recordings and code, with a CLI and bundled skill for agents.
 - [Ghost](https://ferdousbhai.com/ghost): An orchestration layer for all your agent harnesses on Omarchy.
-- [iCloud for Omarchy](https://ferdousbhai.com/icloud): Apple Notes, Photos, Find My, Reminders and Contacts as native apps.
+- [iCloud for Omarchy](https://ferdousbhai.com/icloud): Apple Notes, Photos and Find My as native apps, on one iCloud sign-in.
 - [Omacloud](https://omacloud.computer): Your files and settings on every Omarchy computer, end-to-end encrypted and kept by other Omarchy computers.
 - [Cloudmail](https://ferdousbhai.com/cloudmail): Email for people and organizations on their own domains, plus Gmail, iCloud Mail and HEY.
 

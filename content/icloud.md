@@ -1,15 +1,15 @@
 ---
 title: iCloud for Omarchy
-description: Apple Notes, Photos, Find My, Reminders and Contacts as native Omarchy apps on one iCloud sign-in.
+description: Apple Notes, Photos and Find My as native Omarchy apps on one iCloud sign-in.
 ---
 
 # iCloud for Omarchy
 
-Apple Notes, Photos, Find My, Reminders and Contacts as native [Omarchy](https://omarchy.org) apps, each with a CLI (`icloud-notes --help` and so on). Sign in once, on Apple's own page, and all five use it.
+Apple Notes, Photos and Find My as native [Omarchy](https://omarchy.org) apps, each with a CLI (`icloud-notes --help` and so on). Sign in once, on Apple's own page, and all three use it, as do the calendar, mail, contacts and tasks apps [below](#more).
 
 ## Install
 
-Adds the signed package repository and its key, then installs all five apps; `omarchy update` keeps them current. Each app also installs alone, below.
+Adds the signed package repository and its key, then installs all three apps; `omarchy update` keeps them current. Each app also installs alone, below.
 
 ```sh
 curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash
@@ -35,7 +35,7 @@ curl -fsSL https://ferdousbhai.com/icloud-notes/install.sh | sudo bash
 
 ![iCloud Photos: albums on the left and the library grouped by month](/img/icloud-photos.webp)
 
-Browse by album and month, download originals with their Live Photos, upload photos and videos. Deleting moves to Recently Deleted.
+Browse by album and month, download originals with their Live Photos, upload photos and videos. Deleting moves to Recently Deleted, with Undo. Copy a photo to paste anywhere, or make it your wallpaper.
 
 ```sh
 curl -fsSL https://ferdousbhai.com/icloud-photos/install.sh | sudo bash
@@ -51,21 +51,14 @@ Your devices on a map with battery, last-seen time and a trail. Play Sound and L
 curl -fsSL https://ferdousbhai.com/icloud-findmy/install.sh | sudo bash
 ```
 
-## Reminders {#reminders}
+## Calendar, Mail, Contacts and Reminders {#more}
 
-Browse lists, add or complete reminders, and get a desktop notification when one falls due, even with the window closed.
+These live in apps of their own, because they show your other accounts in the same window. All of them use the same iCloud sign-in.
 
-```sh
-curl -fsSL https://ferdousbhai.com/icloud-reminders/install.sh | sudo bash
-```
-
-## Contacts {#contacts}
-
-Search, add and edit contacts, copy a number, start an email, export a vCard.
-
-```sh
-curl -fsSL https://ferdousbhai.com/icloud-contacts/install.sh | sudo bash
-```
+- [Cloud Calendar](https://github.com/ferdousbhai/cloud-calendar): iCloud, Google and HEY calendars together, with event notifications.
+- [Cloudmail](/cloudmail): iCloud Mail next to Gmail, HEY and your own domains.
+- [Cloud Contacts](https://github.com/ferdousbhai/cloud-contacts): iCloud and Google contacts in one address book.
+- [Cloud Tasks](https://github.com/ferdousbhai/cloud-tasks): iCloud Reminders and Google Tasks together.
 
 ## Requirements
 
@@ -76,4 +69,4 @@ curl -fsSL https://ferdousbhai.com/icloud-contacts/install.sh | sudo bash
 
 - [Source and issues](https://github.com/ferdousbhai/icloud-for-omarchy)
 - [Releases](https://github.com/ferdousbhai/icloud-for-omarchy/releases)
-- The install scripts, to read before running: [all five apps](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh), [Notes](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh), [Photos](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh), [Find My](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh), [Reminders](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh), [Contacts](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-contacts.sh)
+- The install scripts, to read before running: [all three apps](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh), [Notes](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh), [Photos](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh), [Find My](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh)
