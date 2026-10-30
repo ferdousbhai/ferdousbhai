@@ -36,13 +36,14 @@ const installBlock = (id) => {
   if (!install) throw new Error(`content/products.json has no install command for "${id}"`);
   return "```sh\n" + install + "\n```";
 };
+// A note starts lowercase, to follow the command in Ghost's table; here it is its own sentence.
 const sentence = (text) => text[0].toUpperCase() + text.slice(1) + ".";
 const appsMarkdown = products
   .filter((entry) => !entry.third_party)
   .map((entry) => {
     const links = [entry.site && `[More](${entry.site})`, `[Source](${entry.source})`].filter(Boolean).join(" · ");
     const note = entry.note ? `\n\n${sentence(entry.note)}` : "";
-    return `## ${entry.name} {#${entry.id}}\n\n${sentence(entry.need)} ${links}\n\n${installBlock(entry.id)}${note}`;
+    return `## ${entry.name} {#${entry.id}}\n\n${entry.need}. ${links}\n\n${installBlock(entry.id)}${note}`;
   })
   .join("\n\n");
 const expandProducts = (markdownText) =>

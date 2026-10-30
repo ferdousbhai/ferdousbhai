@@ -1,6 +1,6 @@
 ---
 title: iCloud for Omarchy
-description: Apple Notes, Photos and Find My as native Omarchy apps on one iCloud sign-in.
+description: Apple Notes, Photos and Find My as native Omarchy apps on one iCloud sign in.
 ---
 
 # iCloud for Omarchy
