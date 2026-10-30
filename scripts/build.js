@@ -181,7 +181,7 @@ ${[chipHtml("all", "All", true), ...work.groups.map(({ heading, slug }) => chipH
 ${work.groups
   .map(
     ({ heading, slug, more, links }) => `      <section class="group" data-group="${slug}">
-      <h2 class="group__label">${escapeHtml(heading)}</h2>${more ? `<a class="group__more" href="${escapeHtml(more.url)}">${escapeHtml(more.label)} →</a>` : ""}
+      <h2 class="group__label">${escapeHtml(heading)}</h2>${more ? `<a class="group__more" href="${escapeHtml(more.url)}">${escapeHtml(more.label)}&nbsp;→</a>` : ""}
       <ul class="work">
 ${links.map(projectHtml).join("\n")}
       </ul>
@@ -467,7 +467,8 @@ const galleryStylesheet = minifyCss(`
 /* The group's own link: quiet like the footer's, beside the label on a phone,
    a line over the group's cards on a laptop. */
 .group__more {
-  margin-left: 12px;
+  display: inline-block;
+  margin: 0 0 12px 12px;
   color: var(--dim);
   font-size: 0.875rem;
   line-height: 1.25rem;

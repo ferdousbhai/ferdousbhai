@@ -56,7 +56,6 @@
       "cli": "icloud-session",
       "skill": "icloud",
       "install": "curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash",
-      "note": "installs all three apps; for only some, name them: `curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash -s -- icloud-photos`",
       "site": "/icloud"
     },
     {
@@ -82,7 +81,7 @@
     {
       "id": "recall",
       "need": "Search your documents, screenshots, photos, recordings and code by meaning, locally",
-      "name": "Recall for Omarchy",
+      "name": "Recall",
       "source": "https://github.com/ferdousbhai/recall-for-omarchy",
       "cli": "recall",
       "skill": "recall",
