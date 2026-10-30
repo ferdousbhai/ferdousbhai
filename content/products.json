@@ -56,7 +56,7 @@
       "cli": "icloud-session",
       "skill": "icloud",
       "install": "curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash",
-      "note": "installs all three apps; name some (`sudo bash -s -- icloud-photos`) for only those",
+      "note": "installs all three apps; for only some, name them: `curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash -s -- icloud-photos`",
       "site": "/icloud"
     },
     {

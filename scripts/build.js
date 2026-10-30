@@ -41,9 +41,9 @@ const sentence = (text) => text[0].toUpperCase() + text.slice(1) + ".";
 const appsMarkdown = products
   .filter((entry) => !entry.third_party)
   .map((entry) => {
-    const links = [entry.site && `[More](${entry.site})`, `[Source](${entry.source})`].filter(Boolean).join(" · ");
+    const name = entry.site ? `[${entry.name}](${entry.site})` : entry.name;
     const note = entry.note ? `\n\n${sentence(entry.note)}` : "";
-    return `## ${entry.name} {#${entry.id}}\n\n${entry.need}. ${links}\n\n${installBlock(entry.id)}${note}`;
+    return `## ${name} {#${entry.id}}\n\n${entry.need}. [Source](${entry.source})\n\n${installBlock(entry.id)}${note}`;
   })
   .join("\n\n");
 const expandProducts = (markdownText) =>

@@ -17,8 +17,8 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   it as a tag beside the name. Entries in the project list sit under `### ` group headings,
   which become the labels on the page (a swipeable shelf per group on a phone, filter chips
   over one grid on a laptop); entries above any group heading are labelled with the section's
-  own heading; a group heading may end in a link, shown beside its label (`### Omarchy [All apps and
-  install commands](https://ferdousbhai.com/omarchy)`); the section's heading is the homepage's headline. `{projects}` in any
+  own heading; a group heading may end in a link, shown beside its label (`### Omarchy [All Omarchy apps
+  and install commands](https://ferdousbhai.com/omarchy)`); the section's heading is the homepage's headline. `{projects}` in any
   frontmatter value is replaced with the project names. A missing section fails the build. Each
   entry is a card in a gallery, showing `public/img/work/<slug>.webp` (slug: the label
   lowercased, runs of other characters as `-`) and, when present, the looping clip `<slug>.mp4`
