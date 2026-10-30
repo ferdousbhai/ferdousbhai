@@ -6,11 +6,15 @@
 /icloud-notes/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh 302
 /icloud-findmy/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh 302
 /icloud-photos/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh 302
-/icloud-reminders/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh 302
-/icloud-contacts/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-contacts.sh 302
+# iCloud Reminders and Contacts were retired for Cloud Tasks and Cloud Contacts.
+/icloud-reminders/install.sh https://github.com/ferdousbhai/cloud-tasks/releases/latest/download/install.sh 302
+/icloud-contacts/install.sh https://github.com/ferdousbhai/cloud-contacts/releases/latest/download/install.sh 302
 /icloud/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh 302
 /recall/install.sh https://github.com/ferdousbhai/recall-for-omarchy/releases/latest/download/install.sh 302
 /cloudmail/install.sh https://github.com/ferdousbhai/cloud-mail/releases/latest/download/install.sh 302
+/cloud-calendar/install.sh https://github.com/ferdousbhai/cloud-calendar/releases/latest/download/install.sh 302
+/cloud-contacts/install.sh https://github.com/ferdousbhai/cloud-contacts/releases/latest/download/install.sh 302
+/cloud-tasks/install.sh https://github.com/ferdousbhai/cloud-tasks/releases/latest/download/install.sh 302
 /ghost/install.sh https://github.com/ferdousbhai/ghost/releases/latest/download/install.sh 302
 
 # iCloud Notes had its own page before the iCloud apps shared one; its old
