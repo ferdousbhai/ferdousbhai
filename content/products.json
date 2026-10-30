@@ -1,0 +1,123 @@
+{
+  "products": [
+    {
+      "id": "ghost",
+      "need": "An orchestration layer for all your agent harnesses on Omarchy",
+      "name": "Ghost",
+      "source": "https://github.com/ferdousbhai/ghost",
+      "site": "/ghost",
+      "cli": "ghost",
+      "install": "omarchy pkg add ghost",
+      "host": true
+    },
+    {
+      "id": "cloudmail",
+      "need": "Email on your own domains, with Gmail, iCloud Mail and HEY alongside",
+      "name": "Cloudmail",
+      "source": "https://github.com/ferdousbhai/cloud-mail",
+      "cli": "cloudmail",
+      "skill": "cloudmail",
+      "install": "curl -fsSL https://ferdousbhai.com/cloudmail/install.sh | sudo bash",
+      "site": "/cloudmail"
+    },
+    {
+      "id": "cloud-calendar",
+      "need": "iCloud, Google and HEY calendars together, with event notifications",
+      "name": "Cloud Calendar",
+      "source": "https://github.com/ferdousbhai/cloud-calendar",
+      "cli": "cloud-calendar",
+      "skill": "cloud-calendar",
+      "install": "curl -fsSL https://ferdousbhai.com/cloud-calendar/install.sh | sudo bash"
+    },
+    {
+      "id": "cloud-contacts",
+      "need": "iCloud and Google contacts in one address book",
+      "name": "Cloud Contacts",
+      "source": "https://github.com/ferdousbhai/cloud-contacts",
+      "cli": "cloud-contacts",
+      "skill": "cloud-contacts",
+      "install": "curl -fsSL https://ferdousbhai.com/cloud-contacts/install.sh | sudo bash"
+    },
+    {
+      "id": "cloud-tasks",
+      "need": "iCloud Reminders and Google Tasks together",
+      "name": "Cloud Tasks",
+      "source": "https://github.com/ferdousbhai/cloud-tasks",
+      "cli": "cloud-tasks",
+      "skill": "cloud-tasks",
+      "install": "curl -fsSL https://ferdousbhai.com/cloud-tasks/install.sh | sudo bash"
+    },
+    {
+      "id": "icloud",
+      "need": "Apple Notes, Photos and Find My as native apps, on one iCloud sign in",
+      "name": "iCloud for Omarchy",
+      "source": "https://github.com/ferdousbhai/icloud-for-omarchy",
+      "cli": "icloud-session",
+      "skill": "icloud",
+      "install": "curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash",
+      "note": "installs all three apps; name some (`sudo bash -s -- icloud-photos`) for only those",
+      "site": "/icloud"
+    },
+    {
+      "id": "omacloud",
+      "need": "Your files and settings on every Omarchy computer, end to end encrypted, with versions and machine migration",
+      "name": "Omacloud",
+      "source": "https://github.com/ferdousbhai/omacloud",
+      "cli": "omacloud",
+      "skill": "omacloud",
+      "install": "curl -fsSL https://omacloud.computer/install.sh | sudo bash",
+      "site": "https://omacloud.computer"
+    },
+    {
+      "id": "wacli",
+      "need": "Your WhatsApp chats kept as folders on your computer, and messages sent when you ask",
+      "name": "wacli",
+      "source": "https://github.com/ferdousbhai/wacli",
+      "cli": "wacli",
+      "skill": "wacli",
+      "install": "curl -fsSL https://ferdousbhai.com/wacli/install.sh | sudo bash",
+      "section": "wacli"
+    },
+    {
+      "id": "recall",
+      "need": "Search your documents, screenshots, photos, recordings and code by meaning, locally",
+      "name": "Recall for Omarchy",
+      "source": "https://github.com/ferdousbhai/recall-for-omarchy",
+      "cli": "recall",
+      "skill": "recall",
+      "install": "curl -fsSL https://ferdousbhai.com/recall/install.sh | sudo bash",
+      "section": "Recall",
+      "site": "/recall"
+    },
+    {
+      "id": "keep-going",
+      "need": "Keeps your coding agents working until the job is done",
+      "name": "keep-going",
+      "source": "https://github.com/ferdousbhai/keep-going",
+      "cli": "keep-going",
+      "install": "curl -fsSL https://ferdousbhai.com/keep-going/install.sh | sudo bash",
+      "section": "keep-going"
+    },
+    {
+      "id": "omdrop",
+      "need": "AirDrop with nearby Apple devices",
+      "name": "Omdrop",
+      "source": "https://github.com/brentkearney/omdrop-plugin",
+      "cli": "omdrop",
+      "skill": "omdrop",
+      "section": "Omdrop",
+      "third_party": true
+    },
+    {
+      "id": "gws",
+      "need": "Google Drive, Docs, Sheets",
+      "name": "gws",
+      "source": "https://github.com/googleworkspace/cli",
+      "cli": "gws",
+      "skill": "gws-*",
+      "install": "npm install -g @googleworkspace/cli",
+      "section": "gws",
+      "third_party": true
+    }
+  ]
+}

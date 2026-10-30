@@ -9,7 +9,7 @@ summary: Personal site of Ferdous. Software projects: {projects}.
 
 ## What I'm cooking
 
-### Omarchy
+### Omarchy [All apps and install commands](/omarchy)
 
 - [Recall](https://ferdousbhai.com/recall): Local semantic search for files, photos, recordings and code, with a CLI and bundled skill for agents.
 - [Ghost](https://ferdousbhai.com/ghost): An orchestration layer for all your agent harnesses on Omarchy.

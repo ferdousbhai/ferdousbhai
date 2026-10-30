@@ -25,10 +25,45 @@ const readContent = (file) => {
   return { meta, markdown: markdownBody.trim() + "\n" };
 };
 
+// content/products.json is the one catalog of the Omarchy products: what each is for and how to
+// install it. Ghost's ghost-products skill keeps an identical copy for agents. On a page, a line
+// `{install:<id>}` becomes that product's install command, and `{omarchy-apps}` the whole list
+// (its own products, Ghost first; third-party ones are for agents only), in the html and the
+// markdown twin alike.
+const products = JSON.parse(readFileSync(contentDir + "products.json", "utf8")).products;
+const product = (id) => {
+  const found = products.find((entry) => entry.id === id);
+  if (!found?.install) throw new Error(`content/products.json has no install command for "${id}"`);
+  return found;
+};
+const installBlock = (id) => "```bash\n" + product(id).install + "\n```";
+const appsMarkdown = products
+  .filter((entry) => !entry.third_party)
+  .map((entry) => {
+    const links = [entry.site && `[More](${entry.site})`, `[Source](${entry.source})`].filter(Boolean).join(" · ");
+    return `## ${entry.name} {#${entry.id}}\n\n${entry.need}. ${links}\n\n${installBlock(entry.id)}`;
+  })
+  .join("\n\n");
+const expandProducts = (markdownText) =>
+  markdownText
+    .replace(/^\{install:([a-z0-9-]+)\}$/gm, (_, id) => installBlock(id))
+    .replace(/^\{omarchy-apps\}$/gm, () => appsMarkdown);
+
 const { meta, markdown } = readContent("index.md");
 const pages = readdirSync(contentDir)
   .filter((file) => file.endsWith(".md") && file !== "index.md")
-  .map((file) => ({ path: `/${file.slice(0, -3)}`, ...readContent(file) }));
+  .map((file) => {
+    const page = readContent(file);
+    return { path: `/${file.slice(0, -3)}`, ...page, markdown: expandProducts(page.markdown) };
+  });
+
+// Every install command through this site needs its redirect to the release's script.
+const redirects = readFileSync(publicDir + "_redirects", "utf8");
+for (const { id, install = "" } of products) {
+  const [, slug] = install.match(/https:\/\/ferdousbhai\.com\/([a-z0-9-]+)\/install\.sh/) ?? [];
+  if (slug && !redirects.includes(`\n/${slug}/install.sh `))
+    throw new Error(`${id} installs from /${slug}/install.sh, which public/_redirects does not redirect`);
+}
 
 // One grammar for a markdown link, in its three places: a list entry, a link
 // in running text, and an image on its own line.
@@ -50,11 +85,16 @@ const parseLinks = (text) =>
 // Sections are positional, the first being the projects and the second the
 // contact, so their headings are free text; the projects' heading is the
 // homepage's headline. Links are grouped under `### ` headings; links above the
-// first one form a group labelled with the section's own heading. Too few
-// sections throws at the first use of the missing one.
+// first one form a group labelled with the section's own heading. A group
+// heading may end in a link, shown beside the label (`### Omarchy [All apps](/omarchy)`).
+// Too few sections throws at the first use of the missing one.
 const firstLine = (text) => text.slice(0, text.indexOf("\n")).trim();
 const slugOf = (label) => label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const parseGroup = (text) => ({ heading: firstLine(text), slug: slugOf(firstLine(text)), links: parseLinks(text) });
+const GROUP_HEADING = new RegExp(String.raw`^(.*?)(?:\s+${LINK})?$`);
+const parseGroup = (text) => {
+  const [, heading, moreLabel, moreUrl] = firstLine(text).match(GROUP_HEADING);
+  return { heading, slug: slugOf(heading), more: moreUrl && { label: moreLabel, url: moreUrl }, links: parseLinks(text) };
+};
 const sections = markdown
   .split(/^## /m)
   .slice(1)
@@ -138,8 +178,8 @@ ${[chipHtml("all", "All", true), ...work.groups.map(({ heading, slug }) => chipH
       <div class="gallery">
 ${work.groups
   .map(
-    ({ heading, slug, links }) => `      <section class="group" data-group="${slug}">
-      <h2 class="group__label">${escapeHtml(heading)}</h2>
+    ({ heading, slug, more, links }) => `      <section class="group" data-group="${slug}">
+      <h2 class="group__label">${escapeHtml(heading)}</h2>${more ? `<a class="group__more" href="${escapeHtml(more.url)}">${escapeHtml(more.label)} →</a>` : ""}
       <ul class="work">
 ${links.map(projectHtml).join("\n")}
       </ul>
@@ -392,7 +432,7 @@ a.bar__name:hover { color: var(--accent); }
 
 /* Movement only for readers who have not asked for less of it. */
 @media (prefers-reduced-motion: no-preference) {
-  .work__link, .work__name, .work__name::after, .foot a, .bar__name, .doc a, .chip span {
+  .work__link, .work__name, .work__name::after, .foot a, .group__more, .bar__name, .doc a, .chip span {
     transition: color 300ms var(--ease), background-color 300ms var(--ease), opacity 300ms var(--ease), transform 300ms var(--ease), text-decoration-color 300ms var(--ease);
   }
 }
@@ -415,12 +455,22 @@ a.bar__name:hover { color: var(--accent); }
 // the cards' hashes.
 const galleryStylesheet = minifyCss(`
 .group__label {
+  display: inline-block;
   margin: 0 0 12px;
   color: var(--ink);
   font-size: 1rem;
   line-height: 1.5rem;
   font-weight: 600;
 }
+/* The group's own link: quiet like the footer's, beside the label on a phone,
+   a line over the group's cards on a laptop. */
+.group__more {
+  margin-left: 12px;
+  color: var(--dim);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.group__more:hover { color: var(--accent); }
 .work { list-style: none; margin: 0; padding: 0; }
 /* Each card is a shade, no border, with its picture or clip inset 8px; the
    picture's corners are the card's less that gap. */
@@ -547,6 +597,7 @@ const galleryStylesheet = minifyCss(`
     gap: 24px 16px;
   }
   .group, .work { display: contents; }
+  .group__more { grid-column: 1 / -1; margin: 0; }
 ${chipStylesheet}
 }
 

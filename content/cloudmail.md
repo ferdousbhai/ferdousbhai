@@ -33,8 +33,9 @@ cloudmail user invite sam --mailbox sam@theirdomain.com
 
 Adds the signed package repository and its key, then installs Cloudmail; `omarchy update` keeps it current.
 
+{install:cloudmail}
+
 ```sh
-curl -fsSL https://ferdousbhai.com/cloudmail/install.sh | sudo bash
 cloudmail setup you@yourdomain.com
 ```
 

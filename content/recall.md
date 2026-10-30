@@ -9,9 +9,7 @@ Find files by what's in them: a scene in a photo, a passage in a document, an in
 
 ## Install
 
-```bash
-curl -fsSL https://ferdousbhai.com/recall/install.sh | sudo bash
-```
+{install:recall}
 
 For Omarchy on x86_64 and aarch64. Adds Recall's signed package repository, installs it, and sets up the desktop integration and agent skill for you; run it from a terminal on your desktop. Updates arrive with `omarchy update`. The model (about 865 MB) downloads once; first indexing takes a while.
 

@@ -11,9 +11,7 @@ Apple Notes, Photos and Find My as native [Omarchy](https://omarchy.org) apps, e
 
 Adds the signed package repository and its key, then installs all three apps; `omarchy update` keeps them current. Each app also installs alone, below.
 
-```sh
-curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash
-```
+{install:icloud}
 
 Find My asks for your Apple password now and then, as icloud.com does. Store it in the keyring once (or pipe it in, e.g. from `bw get password "Apple ID"`) and it signs itself back in:
 
@@ -53,14 +51,7 @@ curl -fsSL https://ferdousbhai.com/icloud-findmy/install.sh | sudo bash
 
 ## Calendar, Mail, Contacts and Reminders {#more}
 
-These live in apps of their own, because they show your other accounts in the same window. All of them use the same iCloud sign-in.
-
-- [Cloud Calendar](https://github.com/ferdousbhai/cloud-calendar): iCloud, Google and HEY calendars together, with event notifications. `curl -fsSL https://ferdousbhai.com/cloud-calendar/install.sh | sudo bash`
-- [Cloudmail](/cloudmail): iCloud Mail next to Gmail, HEY and your own domains. `curl -fsSL https://ferdousbhai.com/cloudmail/install.sh | sudo bash`
-- [Cloud Contacts](https://github.com/ferdousbhai/cloud-contacts): iCloud and Google contacts in one address book. `curl -fsSL https://ferdousbhai.com/cloud-contacts/install.sh | sudo bash`
-- [Cloud Tasks](https://github.com/ferdousbhai/cloud-tasks): iCloud Reminders and Google Tasks together. `curl -fsSL https://ferdousbhai.com/cloud-tasks/install.sh | sudo bash`
-
-Each adds its own signed package repository, so `omarchy update` keeps it current.
+These live in apps of their own, because they show your other accounts in the same window, and all of them use the same iCloud sign in: Cloud Calendar, [Cloudmail](/cloudmail), Cloud Contacts and Cloud Tasks. Install them from [Omarchy apps](/omarchy).
 
 ## Requirements
 
