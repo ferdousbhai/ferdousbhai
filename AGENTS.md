@@ -17,11 +17,18 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   it as a tag beside the name. Entries in the project list sit under `### ` group headings,
   which become the labels on the page (a swipeable shelf per group on a phone, filter chips
   over one grid on a laptop); entries above any group heading are labelled with the section's
-  own heading; the section's heading is the homepage's headline. `{projects}` in any
+  own heading; a group heading may end in a link, shown beside its label (`### Omarchy [All apps and
+  install commands](/omarchy)`); the section's heading is the homepage's headline. `{projects}` in any
   frontmatter value is replaced with the project names. A missing section fails the build. Each
   entry is a card in a gallery, showing `public/img/work/<slug>.webp` (slug: the label
   lowercased, runs of other characters as `-`) and, when present, the looping clip `<slug>.mp4`
   with that picture as its poster.
+- `content/products.json` — the one catalog of the Omarchy products (id, what it's for, source,
+  page, install command). A page line `{install:<id>}` becomes that product's install command and
+  `{omarchy-apps}` the list on `/omarchy` (third-party entries are for agents only); the build fails
+  when an install command through this site has no `/<slug>/install.sh` line in `_redirects`.
+  Ghost's `skills/ghost-products/products.json` is a copy for agents (its `host` entry is Ghost
+  itself, which that skill doesn't list): change this one, then copy it there.
 - `motion/<slug>.html` — a project's clip as a scene: a 1280×800 stage whose `render(t)` sets
   everything from the time alone (helpers in `motion/lib.js`, model in `motion/keep-going.html`).
   `pnpm motion [slug]` records scenes with a headless Chromium into `public/img/work/`; like the
