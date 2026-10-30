@@ -26,22 +26,23 @@ const readContent = (file) => {
 };
 
 // content/products.json is the one catalog of the Omarchy products: what each is for and how to
-// install it. Ghost's ghost-products skill keeps an identical copy for agents. On a page, a line
-// `{install:<id>}` becomes that product's install command, and `{omarchy-apps}` the whole list
-// (its own products, Ghost first; third-party ones are for agents only), in the html and the
+// install it (Ghost's ghost-products skill keeps a copy for agents; see AGENTS.md). On a page, a
+// line `{install:<id>}` becomes that product's install command, and `{omarchy-apps}` the whole
+// list (its own products, Ghost first; third-party ones are for agents only), in the html and the
 // markdown twin alike.
 const products = JSON.parse(readFileSync(contentDir + "products.json", "utf8")).products;
-const product = (id) => {
-  const found = products.find((entry) => entry.id === id);
-  if (!found?.install) throw new Error(`content/products.json has no install command for "${id}"`);
-  return found;
+const installBlock = (id) => {
+  const install = products.find((entry) => entry.id === id)?.install;
+  if (!install) throw new Error(`content/products.json has no install command for "${id}"`);
+  return "```sh\n" + install + "\n```";
 };
-const installBlock = (id) => "```bash\n" + product(id).install + "\n```";
+const sentence = (text) => text[0].toUpperCase() + text.slice(1) + ".";
 const appsMarkdown = products
   .filter((entry) => !entry.third_party)
   .map((entry) => {
     const links = [entry.site && `[More](${entry.site})`, `[Source](${entry.source})`].filter(Boolean).join(" · ");
-    return `## ${entry.name} {#${entry.id}}\n\n${entry.need}. ${links}\n\n${installBlock(entry.id)}`;
+    const note = entry.note ? `\n\n${sentence(entry.note)}` : "";
+    return `## ${entry.name} {#${entry.id}}\n\n${sentence(entry.need)} ${links}\n\n${installBlock(entry.id)}${note}`;
   })
   .join("\n\n");
 const expandProducts = (markdownText) =>

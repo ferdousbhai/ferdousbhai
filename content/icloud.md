@@ -51,7 +51,7 @@ curl -fsSL https://ferdousbhai.com/icloud-findmy/install.sh | sudo bash
 
 ## Calendar, Mail, Contacts and Reminders {#more}
 
-These live in apps of their own, because they show your other accounts in the same window, and all of them use the same iCloud sign in: Cloud Calendar, [Cloudmail](/cloudmail), Cloud Contacts and Cloud Tasks. Install them from [Omarchy apps](/omarchy).
+These live in apps of their own, because they show your other accounts in the same window, and all of them use the same iCloud sign in: [Cloud Calendar](/omarchy#cloud-calendar), [Cloudmail](/cloudmail), [Cloud Contacts](/omarchy#cloud-contacts) and [Cloud Tasks](/omarchy#cloud-tasks).
 
 ## Requirements
 

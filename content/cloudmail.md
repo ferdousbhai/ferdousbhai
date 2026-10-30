@@ -35,6 +35,8 @@ Adds the signed package repository and its key, then installs Cloudmail; `omarch
 
 {install:cloudmail}
 
+Then, for your own domain:
+
 ```sh
 cloudmail setup you@yourdomain.com
 ```

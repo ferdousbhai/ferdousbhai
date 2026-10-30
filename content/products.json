@@ -8,7 +8,8 @@
       "site": "/ghost",
       "cli": "ghost",
       "install": "omarchy pkg add ghost",
-      "host": true
+      "host": true,
+      "note": "then [turn it on for your login](https://github.com/ferdousbhai/ghost/blob/master/docs/getting-started.md)"
     },
     {
       "id": "cloudmail",

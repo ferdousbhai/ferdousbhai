@@ -27,8 +27,9 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   page, install command). A page line `{install:<id>}` becomes that product's install command and
   `{omarchy-apps}` the list on `/omarchy` (third-party entries are for agents only); the build fails
   when an install command through this site has no `/<slug>/install.sh` line in `_redirects`.
-  Ghost's `skills/ghost-products/products.json` is a copy for agents (its `host` entry is Ghost
-  itself, which that skill doesn't list): change this one, then copy it there.
+  Ghost's `skills/ghost-products/products.json` is a copy for agents: change this one, then copy
+  it there. Its `host` entry is Ghost itself, which that skill's table must skip (Ghost's
+  `scripts/ghost-products.ts` doesn't yet).
 - `motion/<slug>.html` — a project's clip as a scene: a 1280×800 stage whose `render(t)` sets
   everything from the time alone (helpers in `motion/lib.js`, model in `motion/keep-going.html`).
   `pnpm motion [slug]` records scenes with a headless Chromium into `public/img/work/`; like the
@@ -54,7 +55,7 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   pictures and clips in `public/img/work/`) and `public/fonts/` (Geist and Geist Mono, OFL) —
   the tracked static assets
 - `public/_redirects` — each project's `/<slug>/install.sh` to the install script attached to that project's latest release,
-  and retired page paths to where their content moved
+  retired install paths to their replacement's script, and retired page paths to where their content moved
 - `src/worker.js` — the only script, run for `/img/work/*.mp4` alone: static assets are served
   without byte ranges, and Safari plays video only from a server that answers a Range request
   with 206, so it slices the clip. Everything else is served by the assets directly.
