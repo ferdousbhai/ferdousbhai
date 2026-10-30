@@ -5,15 +5,15 @@ description: Search your files by meaning, locally. A native Omarchy app with a 
 
 # Recall
 
-Find files by what's in them: a scene in a photo, a passage in a document, an interval in a recording, source code by what it does. A native Omarchy search panel, a CLI and a bundled agent skill share one local engine (EmbeddingGemma 2). Files, OCR text and the index stay on your computer, and only the folders you choose are indexed.
+Find files by what's in them: a scene in a photo, a passage in a document, an interval in a recording, source code by what it does. A native Omarchy search panel, a CLI and a bundled agent skill share one local engine (EmbeddingGemma 2). Files, OCR text and the index stay on your computer, and only the folders you choose are indexed: Documents and Pictures to start.
 
 ## Install
 
 ```bash
-curl -fsSL https://ferdousbhai.com/recall/install.sh | bash
+curl -fsSL https://ferdousbhai.com/recall/install.sh | sudo bash
 ```
 
-For Omarchy on x86_64 and aarch64. Downloads a checksum-verified release, installs dependencies through Omarchy, and sets up the desktop integration and agent skill. The model downloads once; first indexing takes a while. An Omarchy package is in review; until it ships, use the installer.
+For Omarchy on x86_64 and aarch64. Adds Recall's signed package repository, installs it, and sets up the desktop integration and agent skill for you; run it from a terminal on your desktop. Updates arrive with `omarchy update`. The model (about 865 MB) downloads once; first indexing takes a while.
 
 ## On your desktop
 

@@ -55,10 +55,12 @@ curl -fsSL https://ferdousbhai.com/icloud-findmy/install.sh | sudo bash
 
 These live in apps of their own, because they show your other accounts in the same window. All of them use the same iCloud sign-in.
 
-- [Cloud Calendar](https://github.com/ferdousbhai/cloud-calendar): iCloud, Google and HEY calendars together, with event notifications.
-- [Cloudmail](/cloudmail): iCloud Mail next to Gmail, HEY and your own domains.
-- [Cloud Contacts](https://github.com/ferdousbhai/cloud-contacts): iCloud and Google contacts in one address book.
-- [Cloud Tasks](https://github.com/ferdousbhai/cloud-tasks): iCloud Reminders and Google Tasks together.
+- [Cloud Calendar](https://github.com/ferdousbhai/cloud-calendar): iCloud, Google and HEY calendars together, with event notifications. `curl -fsSL https://ferdousbhai.com/cloud-calendar/install.sh | sudo bash`
+- [Cloudmail](/cloudmail): iCloud Mail next to Gmail, HEY and your own domains. `curl -fsSL https://ferdousbhai.com/cloudmail/install.sh | sudo bash`
+- [Cloud Contacts](https://github.com/ferdousbhai/cloud-contacts): iCloud and Google contacts in one address book. `curl -fsSL https://ferdousbhai.com/cloud-contacts/install.sh | sudo bash`
+- [Cloud Tasks](https://github.com/ferdousbhai/cloud-tasks): iCloud Reminders and Google Tasks together. `curl -fsSL https://ferdousbhai.com/cloud-tasks/install.sh | sudo bash`
+
+Each adds its own signed package repository, so `omarchy update` keeps it current.
 
 ## Requirements
 
