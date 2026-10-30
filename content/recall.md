@@ -21,7 +21,7 @@ For Omarchy on x86_64 and aarch64. Adds Recall's signed package repository, inst
 
 The CLI answers in JSON without opening a window:
 
-```bash
+```sh
 recall search "payment error" --kind screenshot --limit 5
 recall search "retry with exponential backoff" --code
 recall text 123 --code

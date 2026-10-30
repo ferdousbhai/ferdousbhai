@@ -28,7 +28,7 @@ const readContent = (file) => {
 // content/products.json is the one catalog of the Omarchy products: what each is for and how to
 // install it (Ghost's ghost-products skill keeps a copy for agents; see AGENTS.md). On a page, a
 // line `{install:<id>}` becomes that product's install command, and `{omarchy-apps}` the whole
-// list (its own products, Ghost first; third-party ones are for agents only), in the html and the
+// list (in the catalog's order; third-party ones are for agents only), in the html and the
 // markdown twin alike.
 const products = JSON.parse(readFileSync(contentDir + "products.json", "utf8")).products;
 const installBlock = (id) => {
@@ -88,7 +88,7 @@ const parseLinks = (text) =>
 // contact, so their headings are free text; the projects' heading is the
 // homepage's headline. Links are grouped under `### ` headings; links above the
 // first one form a group labelled with the section's own heading. A group
-// heading may end in a link, shown beside the label (`### Omarchy [All apps](/omarchy)`).
+// heading may end in a link, shown beside the label (`### Omarchy [All apps](https://ferdousbhai.com/omarchy)`).
 // Too few sections throws at the first use of the missing one.
 const firstLine = (text) => text.slice(0, text.indexOf("\n")).trim();
 const slugOf = (label) => label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
