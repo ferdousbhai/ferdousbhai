@@ -15,6 +15,8 @@
 /cloud-calendar/install.sh https://github.com/ferdousbhai/cloud-calendar/releases/latest/download/install.sh 302
 /cloud-contacts/install.sh https://github.com/ferdousbhai/cloud-contacts/releases/latest/download/install.sh 302
 /cloud-tasks/install.sh https://github.com/ferdousbhai/cloud-tasks/releases/latest/download/install.sh 302
+/wacli/install.sh https://github.com/ferdousbhai/wacli/releases/latest/download/install.sh 302
+/keep-going/install.sh https://github.com/ferdousbhai/keep-going/releases/latest/download/install.sh 302
 /ghost/install.sh https://github.com/ferdousbhai/ghost/releases/latest/download/install.sh 302
 
 # iCloud Notes had its own page before the iCloud apps shared one; its old
