@@ -1,6 +1,6 @@
 #!/bin/bash
 # iCloud on Omarchy in one go: Mail, Calendar, Contacts, Reminders, Notes,
-# Photos and Find My, then one iCloud sign in for all of them.
+# Photos, Find My and iCloud Drive, then one iCloud sign in for all of them.
 #
 #   curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash
 #   curl -fsSL .../icloud/install.sh | sudo bash -s -- icloud cloudmail   # just these
