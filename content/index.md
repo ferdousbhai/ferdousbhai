@@ -36,3 +36,4 @@ summary: Personal site of Ferdous. Software projects: {projects}.
 - Email: [hi@ferdousbhai.com](mailto:hi@ferdousbhai.com)
 - GitHub: [github.com/ferdousbhai](https://github.com/ferdousbhai)
 - X: [x.com/ferdousbhai](https://x.com/ferdousbhai)
+- Sponsor: [github.com/sponsors/ferdousbhai](https://github.com/sponsors/ferdousbhai)
