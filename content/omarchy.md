@@ -5,7 +5,7 @@ description: Every Omarchy app I make, each with its one line install: Ghost, iC
 
 # Omarchy apps
 
-One command installs any of them. It shows a checklist, with the apps that keep iCloud working already marked, then signs you in to iCloud once for all of them.
+One command installs everything for someone coming from a Mac. It shows a checklist, with the apps that keep iCloud working already marked, then signs you in to iCloud once for all of them.
 
 ```sh
 curl -fsSL https://ferdousbhai.com/omarchy/install.sh | sudo bash
