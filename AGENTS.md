@@ -30,7 +30,7 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   A product with `replaces` (the Mac apps it stands in for) is in the `{mac-apps}` list and starts
   marked on the all-in-one installer's checklist; `icloud` is the command that links the iCloud
   sign in to it and `setup` its first setup at a terminal, both run by that installer.
-  `checklist: false` keeps a product off that checklist.
+  `checklist: false` keeps a product off that checklist; a string replaces its description there.
   Ghost's `skills/ghost-products/products.json` is a copy for agents: change this one, then copy
   it there. Its `host` entry is Ghost itself, which that skill's table must skip (Ghost's
   `scripts/ghost-products.ts` doesn't yet).

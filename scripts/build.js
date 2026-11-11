@@ -64,15 +64,16 @@ const expandProducts = (markdownText) =>
 // /omarchy/install.sh installs any of the products in one run: scripts/omarchy-install.sh with the
 // catalog written in. It runs each product's own installer, so it needs the script's address, not
 // the one-liner; a product installed another way (Ghost) gives its command. The ones that replace
-// a Mac app start marked on its checklist; `checklist: false` keeps a product off it (keep-going,
-// a tool for coding agents, has nothing to do with a desktop setup). `icloud` links the iCloud sign in to that product and
+// a Mac app start marked on its checklist. `checklist: false` keeps a product off it (the
+// checklist is for someone coming from a Mac); a string is what the checklist says it is for there. `icloud` links the iCloud sign in to that product and
 // `setup` is its first setup at a terminal; both run as the desktop user once everything is in.
 const shellQuote = (text = "") => `'${text.replaceAll("'", `'\\''`)}'`;
 const installerProducts = products
   .filter((entry) => entry.install && !entry.third_party && entry.checklist !== false)
   .map((entry) => {
     const [, script] = entry.install.match(/^curl -fsSL (https:\/\/\S+) \| sudo bash$/) ?? [];
-    const fields = [entry.id, entry.name, entry.need, entry.replaces ? "1" : "0", entry.cli, script ?? entry.install, entry.icloud, entry.setup];
+    const need = typeof entry.checklist === "string" ? entry.checklist : entry.need;
+    const fields = [entry.id, entry.name, need, entry.replaces ? "1" : "0", entry.cli, script ?? entry.install, entry.icloud, entry.setup];
     return `product ${fields.map(shellQuote).join(" ")}`;
   })
   .join("\n");
