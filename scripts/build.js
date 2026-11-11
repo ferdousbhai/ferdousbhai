@@ -46,40 +46,31 @@ const appsMarkdown = products
     return `## ${name} {#${entry.id}}\n\n${entry.need}. [Source](${entry.source})\n\n${installBlock(entry.id)}${note}`;
   })
   .join("\n\n");
-// A product that `replaces` a Mac app keeps iCloud working after a move from a Mac. `{mac-apps}` is
-// that list, Mac app first; a product without a page of its own links its entry in `{omarchy-apps}`.
-const macAppsMarkdown = products
-  .filter((entry) => entry.replaces)
-  .map((entry) => {
-    const link = entry.third_party ? entry.source : (entry.site ?? `#${entry.id}`);
-    return `- ${entry.replaces}: [${entry.name}](${link})${entry.third_party ? ", a separate project with its own install" : ""}`;
-  })
-  .join("\n");
 const expandProducts = (markdownText) =>
   markdownText
     .replace(/^\{install:([a-z0-9-]+)\}$/gm, (_, id) => installBlock(id))
-    .replace(/^\{mac-apps\}$/gm, () => macAppsMarkdown)
     .replace(/^\{omarchy-apps\}$/gm, () => appsMarkdown);
 
-// /omarchy/install.sh installs any of the products in one run: scripts/omarchy-install.sh with the
-// catalog written in. It runs each product's own installer, so it needs the script's address, not
-// the one-liner; a product installed another way (Ghost) gives its command. The ones that replace
-// a Mac app start marked on its checklist. `checklist: false` keeps a product off it (the
-// checklist is for someone coming from a Mac); a string is what the checklist says it is for there. `icloud` links the iCloud sign in to that product and
-// `setup` is its first setup at a terminal; both run as the desktop user once everything is in.
+// /icloud/install.sh is iCloud on Omarchy in one run: scripts/icloud-install.sh with the catalog
+// written in. It installs every product that `replaces` a Mac app, by that product's own installer
+// (the address in its one-liner, or `script` where the one-liner is this installer itself), and
+// asks about a product with an `offer` (its question). `icloud` is the command that links the
+// iCloud sign in to a product, run as the desktop user once everything is in; `hint` is said last.
+const INSTALLER_PATH = "/icloud/install.sh";
 const shellQuote = (text = "") => `'${text.replaceAll("'", `'\\''`)}'`;
 const installerProducts = products
-  .filter((entry) => entry.install && !entry.third_party && entry.checklist !== false)
+  .filter((entry) => entry.install && !entry.third_party && (entry.replaces || entry.offer))
   .map((entry) => {
     const [, script] = entry.install.match(/^curl -fsSL (https:\/\/\S+) \| sudo bash$/) ?? [];
-    const need = typeof entry.checklist === "string" ? entry.checklist : entry.need;
-    const fields = [entry.id, entry.name, need, entry.replaces ? "1" : "0", entry.cli, script ?? entry.install, entry.icloud, entry.setup];
+    const from = entry.script ?? script;
+    if (!from || from === SITE_URL + INSTALLER_PATH) throw new Error(`${entry.id} has no installer of its own for ${INSTALLER_PATH} to run`);
+    const fields = [entry.id, entry.name, entry.need, entry.cli, from, entry.icloud, entry.hint, entry.offer];
     return `product ${fields.map(shellQuote).join(" ")}`;
   })
   .join("\n");
-const installerTemplate = readFileSync(repositoryRoot + "scripts/omarchy-install.sh", "utf8");
-if (!installerTemplate.includes("\n# {products}\n")) throw new Error("scripts/omarchy-install.sh has no `# {products}` line");
-const omarchyInstaller = installerTemplate.replace("\n# {products}\n", () => `\n${installerProducts}\n`);
+const installerTemplate = readFileSync(repositoryRoot + "scripts/icloud-install.sh", "utf8");
+if (!installerTemplate.includes("\n# {products}\n")) throw new Error("scripts/icloud-install.sh has no `# {products}` line");
+const icloudInstaller = installerTemplate.replace("\n# {products}\n", () => `\n${installerProducts}\n`);
 
 const { meta, markdown } = readContent("index.md");
 const pages = readdirSync(contentDir)
@@ -89,11 +80,13 @@ const pages = readdirSync(contentDir)
     return { path: `/${file.slice(0, -3)}`, ...page, markdown: expandProducts(page.markdown) };
   });
 
-// Every install command through this site needs its redirect to the release's script.
+// Every install command through this site needs its redirect to the release's script, except the
+// one script the site writes itself, which a redirect would hide.
 const redirects = readFileSync(publicDir + "_redirects", "utf8");
+if (redirects.includes(`\n${INSTALLER_PATH} `)) throw new Error(`public/_redirects redirects ${INSTALLER_PATH}, which the build writes`);
 for (const { id, install = "" } of products) {
   const [, slug] = install.match(/https:\/\/ferdousbhai\.com\/([a-z0-9-]+)\/install\.sh/) ?? [];
-  if (slug && !redirects.includes(`\n/${slug}/install.sh `))
+  if (slug && `/${slug}/install.sh` !== INSTALLER_PATH && !redirects.includes(`\n/${slug}/install.sh `))
     throw new Error(`${id} installs from /${slug}/install.sh, which public/_redirects does not redirect`);
 }
 
@@ -862,7 +855,7 @@ const generatedFiles = {
 
 ${routeHeaders}
 
-/omarchy/install.sh
+${INSTALLER_PATH}
   Content-Type: text/plain; charset=utf-8
 
 /favicon.svg
@@ -896,8 +889,8 @@ for (const route of routes) {
   generatedFiles[`${stem(route.path)}.md`] = route.markdown;
 }
 
-mkdirSync(publicDir + "omarchy", { recursive: true });
-generatedFiles["omarchy/install.sh"] = omarchyInstaller;
+mkdirSync(publicDir + "icloud", { recursive: true });
+generatedFiles[INSTALLER_PATH.slice(1)] = icloudInstaller;
 
 for (const [name, content] of Object.entries(generatedFiles)) {
   writeFileSync(publicDir + name, content);

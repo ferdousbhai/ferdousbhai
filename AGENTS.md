@@ -27,17 +27,18 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   page, install command). A page line `{install:<id>}` becomes that product's install command and
   `{omarchy-apps}` the list on `/omarchy` (third-party entries are for agents only); the build fails
   when an install command through this site has no `/<slug>/install.sh` line in `_redirects`.
-  A product with `replaces` (the Mac apps it stands in for) is in the `{mac-apps}` list and starts
-  marked on the all-in-one installer's checklist; `icloud` is the command that links the iCloud
-  sign in to it and `setup` its first setup at a terminal, both run by that installer.
-  `checklist: false` keeps a product off that checklist; a string replaces its description there.
+  A product with `replaces` (the Mac apps it stands in for) is installed by the iCloud installer,
+  which asks about one with an `offer` (the question); `icloud` is the command that links the
+  iCloud sign in to it, `hint` a line said once it is in, and `script` its own installer where its
+  one-liner is the iCloud installer itself.
   Ghost's `skills/ghost-products/products.json` is a copy for agents: change this one, then copy
   it there. Its `host` entry is Ghost itself, which that skill's table must skip (Ghost's
   `scripts/ghost-products.ts` doesn't yet).
-- `scripts/omarchy-install.sh` — the all-in-one installer. The build writes the catalog over its
-  `# {products}` line and serves it at `/omarchy/install.sh` (generated, gitignored). It shows a
-  checklist, runs each chosen product's own installer, then as the desktop user signs in to iCloud
-  once, links it to each app and runs each `setup`. No repository or signing logic of its own.
+- `scripts/icloud-install.sh` — the iCloud installer: every iCloud app in one run. The build writes
+  the catalog over its `# {products}` line and serves it at `/icloud/install.sh` (generated,
+  gitignored; `_redirects` must not redirect that path). It runs each product's own installer,
+  then as the desktop user signs in to iCloud once and links it to each app. No repository or
+  signing logic of its own.
 - `motion/<slug>.html` — a project's clip as a scene: a 1280×800 stage whose `render(t)` sets
   everything from the time alone (helpers in `motion/lib.js`, model in `motion/keep-going.html`).
   `pnpm motion [slug]` records scenes with a headless Chromium into `public/img/work/`; like the

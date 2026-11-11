@@ -1,19 +1,43 @@
 ---
 title: iCloud for Omarchy
-description: Apple Notes, Photos and Find My as native Omarchy apps on one iCloud sign in.
+description: Keep your iCloud on Omarchy: Mail, Calendar, Contacts, Reminders, Notes, Photos and Find My as native apps, on one iCloud sign in.
 ---
 
 # iCloud for Omarchy
 
-Apple Notes, Photos and Find My as native [Omarchy](https://omarchy.org) apps, each with a CLI (`icloud-notes --help` and so on). Sign in once, on Apple's own page, and all three use it, as do the calendar, mail, contacts and tasks apps [below](#more).
+Moving from a Mac to [Omarchy](https://omarchy.org)? Your iCloud account comes with you. Mail, Calendar, Contacts, Reminders, Notes, Photos and Find My are native apps here, each with a CLI, and they sync straight to iCloud, so your iPhone and the Mac you left stay in step.
 
 ## Install
 
-Adds the signed package repository and its key, then installs all three apps; `omarchy update` keeps them current. Each app also installs alone, below.
+One command installs all of them, then opens Apple's own sign in page once. Every app uses that one sign in.
 
 {install:icloud}
 
-For these and the calendar, mail, contacts and reminders apps in one go, with one sign in at the end, use the [one command for every app](/omarchy).
+Each app adds its own signed package repository, so `omarchy update` keeps it current with the rest of your system. The command is safe to run again, and you can [read the script](https://ferdousbhai.com/icloud/install.sh) first. To install only some, name them, from `icloud` (Notes, Photos and Find My), `cloudmail`, `cloud-calendar`, `cloud-contacts`, `cloud-tasks` and `recall`:
+
+```sh
+curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash -s -- icloud cloud-calendar
+```
+
+It asks one question: whether to add [Recall](/recall), which lets these apps search by meaning.
+
+## What replaces what {#mac}
+
+- Mail: [Cloudmail](/cloudmail)
+- Calendar: [Cloud Calendar](/omarchy#cloud-calendar)
+- Contacts: [Cloud Contacts](/omarchy#cloud-contacts)
+- Reminders: [Cloud Tasks](/omarchy#cloud-tasks)
+- Notes: [Notes](#notes)
+- Photos: [Photos](#photos)
+- Find My: [Find My](#findmy)
+- AirDrop: [Omdrop](https://github.com/brentkearney/omdrop-plugin), a separate project with its own install
+
+The mail, calendar, contacts and reminders apps show your Google accounts in the same window, and Cloudmail adds mail on your own domains. iCloud Drive, Messages, Passwords and Safari sync have no replacement here yet.
+
+## Requirements
+
+- Omarchy, or any Arch Linux desktop.
+- An Apple ID with Advanced Data Protection off and Access iCloud Data on the Web on.
 
 Find My asks for your Apple password now and then, as icloud.com does. Store it in the keyring once (or pipe it in, e.g. from `bw get password "Apple ID"`) and it signs itself back in:
 
@@ -51,17 +75,12 @@ Your devices on a map with battery, last-seen time and a trail. Play Sound and L
 curl -fsSL https://ferdousbhai.com/icloud-findmy/install.sh | sudo bash
 ```
 
-## Calendar, Mail, Contacts and Reminders {#more}
+## Mail, Calendar, Contacts and Reminders {#more}
 
-These live in apps of their own, because they show your other accounts in the same window, and all of them use the same iCloud sign in: [Cloud Calendar](/omarchy#cloud-calendar), [Cloudmail](/cloudmail), [Cloud Contacts](/omarchy#cloud-contacts) and [Cloud Tasks](/omarchy#cloud-tasks).
-
-## Requirements
-
-- Omarchy, or any Arch Linux desktop.
-- An Apple ID with Advanced Data Protection off and Access iCloud Data on the Web on.
+These live in apps of their own, because they show your other accounts in the same window, and all of them use the same iCloud sign in: [Cloudmail](/cloudmail), [Cloud Calendar](/omarchy#cloud-calendar), [Cloud Contacts](/omarchy#cloud-contacts) and [Cloud Tasks](/omarchy#cloud-tasks). Each also installs alone, from its entry there.
 
 ## Links
 
 - [Source and issues](https://github.com/ferdousbhai/icloud-for-omarchy)
 - [Releases](https://github.com/ferdousbhai/icloud-for-omarchy/releases)
-- The install scripts, to read before running: [all three apps](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh), [Notes](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh), [Photos](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh), [Find My](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh)
+- The install scripts, to read before running: [everything](https://ferdousbhai.com/icloud/install.sh), [Notes, Photos and Find My](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh), [Notes](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh), [Photos](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh), [Find My](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh)
