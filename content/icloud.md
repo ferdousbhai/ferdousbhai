@@ -13,6 +13,8 @@ Adds the signed package repository and its key, then installs all three apps; `o
 
 {install:icloud}
 
+For these and the calendar, mail, contacts and reminders apps in one go, with one sign in at the end, use the [one command for every app](/omarchy).
+
 Find My asks for your Apple password now and then, as icloud.com does. Store it in the keyring once (or pipe it in, e.g. from `bw get password "Apple ID"`) and it signs itself back in:
 
 ```sh

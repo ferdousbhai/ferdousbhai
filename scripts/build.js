@@ -46,10 +46,39 @@ const appsMarkdown = products
     return `## ${name} {#${entry.id}}\n\n${entry.need}. [Source](${entry.source})\n\n${installBlock(entry.id)}${note}`;
   })
   .join("\n\n");
+// A product that `replaces` a Mac app keeps iCloud working after a move from a Mac. `{mac-apps}` is
+// that list, Mac app first; a product without a page of its own links its entry in `{omarchy-apps}`.
+const macAppsMarkdown = products
+  .filter((entry) => entry.replaces)
+  .map((entry) => {
+    const link = entry.third_party ? entry.source : (entry.site ?? `#${entry.id}`);
+    return `- ${entry.replaces}: [${entry.name}](${link})${entry.third_party ? ", a separate project with its own install" : ""}`;
+  })
+  .join("\n");
 const expandProducts = (markdownText) =>
   markdownText
     .replace(/^\{install:([a-z0-9-]+)\}$/gm, (_, id) => installBlock(id))
+    .replace(/^\{mac-apps\}$/gm, () => macAppsMarkdown)
     .replace(/^\{omarchy-apps\}$/gm, () => appsMarkdown);
+
+// /omarchy/install.sh installs any of the products in one run: scripts/omarchy-install.sh with the
+// catalog written in. It runs each product's own installer, so it needs the script's address, not
+// the one-liner; a product installed another way (Ghost) gives its command. The ones that replace
+// a Mac app start marked on its checklist; `checklist: false` keeps a product off it (keep-going,
+// a tool for coding agents, has nothing to do with a desktop setup). `icloud` links the iCloud sign in to that product and
+// `setup` is its first setup at a terminal; both run as the desktop user once everything is in.
+const shellQuote = (text = "") => `'${text.replaceAll("'", `'\\''`)}'`;
+const installerProducts = products
+  .filter((entry) => entry.install && !entry.third_party && entry.checklist !== false)
+  .map((entry) => {
+    const [, script] = entry.install.match(/^curl -fsSL (https:\/\/\S+) \| sudo bash$/) ?? [];
+    const fields = [entry.id, entry.name, entry.need, entry.replaces ? "1" : "0", entry.cli, script ?? entry.install, entry.icloud, entry.setup];
+    return `product ${fields.map(shellQuote).join(" ")}`;
+  })
+  .join("\n");
+const installerTemplate = readFileSync(repositoryRoot + "scripts/omarchy-install.sh", "utf8");
+if (!installerTemplate.includes("\n# {products}\n")) throw new Error("scripts/omarchy-install.sh has no `# {products}` line");
+const omarchyInstaller = installerTemplate.replace("\n# {products}\n", () => `\n${installerProducts}\n`);
 
 const { meta, markdown } = readContent("index.md");
 const pages = readdirSync(contentDir)
@@ -832,6 +861,9 @@ const generatedFiles = {
 
 ${routeHeaders}
 
+/omarchy/install.sh
+  Content-Type: text/plain; charset=utf-8
+
 /favicon.svg
   Cache-Control: public, max-age=604800
 
@@ -862,6 +894,9 @@ for (const route of routes) {
   generatedFiles[`${stem(route.path)}.html`] = shell(route);
   generatedFiles[`${stem(route.path)}.md`] = route.markdown;
 }
+
+mkdirSync(publicDir + "omarchy", { recursive: true });
+generatedFiles["omarchy/install.sh"] = omarchyInstaller;
 
 for (const [name, content] of Object.entries(generatedFiles)) {
   writeFileSync(publicDir + name, content);

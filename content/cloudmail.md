@@ -35,6 +35,8 @@ Adds the signed package repository and its key, then installs Cloudmail; `omarch
 
 {install:cloudmail}
 
+Coming from a Mac? [One command](/omarchy) installs this with the iCloud notes, photos, calendar, contacts and reminders apps.
+
 Then, for your own domain:
 
 ```sh
