@@ -7,17 +7,17 @@
 /icloud-findmy/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh 302
 /icloud-photos/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh 302
 /icloud-drive/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-drive.sh 302
-# iCloud Reminders and Contacts were retired for Cloud Tasks and Cloud Contacts.
-/icloud-reminders/install.sh https://github.com/ferdousbhai/cloud-tasks/releases/latest/download/install.sh 302
-/icloud-contacts/install.sh https://github.com/ferdousbhai/cloud-contacts/releases/latest/download/install.sh 302
+/icloud-reminders/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh 302
+/icloud-contacts/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-contacts.sh 302
 # /icloud/install.sh is not here: the build writes it (scripts/icloud-install.sh), the one
 # installer for every iCloud app. Its first address was /omarchy/install.sh.
 /omarchy/install.sh /icloud/install.sh 302
 /recall/install.sh https://github.com/ferdousbhai/recall-for-omarchy/releases/latest/download/install.sh 302
 /cloudmail/install.sh https://github.com/ferdousbhai/cloud-mail/releases/latest/download/install.sh 302
 /cloud-calendar/install.sh https://github.com/ferdousbhai/cloud-calendar/releases/latest/download/install.sh 302
-/cloud-contacts/install.sh https://github.com/ferdousbhai/cloud-contacts/releases/latest/download/install.sh 302
-/cloud-tasks/install.sh https://github.com/ferdousbhai/cloud-tasks/releases/latest/download/install.sh 302
+# Cloud Contacts and Cloud Tasks were retired for iCloud Contacts and Reminders (2026-11-14).
+/cloud-contacts/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-contacts.sh 302
+/cloud-tasks/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh 302
 /wacli/install.sh https://github.com/ferdousbhai/wacli/releases/latest/download/install.sh 302
 /keep-going/install.sh https://github.com/ferdousbhai/keep-going/releases/latest/download/install.sh 302
 /ghost/install.sh https://github.com/ferdousbhai/ghost/releases/latest/download/install.sh 302
