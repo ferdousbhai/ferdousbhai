@@ -41,9 +41,10 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   signing logic of its own.
 - `motion/<slug>.html` — a project's clip as a scene: a 1280×800 stage whose `render(t)` sets
   everything from the time alone (helpers in `motion/lib.js`, model in `motion/keep-going.html`).
-  `pnpm motion [slug]` records scenes with a headless Chromium into `public/img/work/`; like the
-  share cards, the clips are tracked. Scenes hold invented sample content only: never a real
-  person, address, file, message or location.
+  The recorded clips and posters in `public/img/work/` are tracked; the repo no longer has a
+  recorder, so a changed scene must be recorded outside it (step `render(t)` at 30 fps, encode with
+  ffmpeg). Scenes hold invented sample content only: never a real person, address, file, message
+  or location.
 - `content/<slug>.md` — any other file is a page served at `/<slug>` (and `/<slug>.md`), with
   `title` and `description` frontmatter and a body in plain markdown: headings, paragraphs,
   bullet lists, fenced code, images on their own line (PNG or WebP under `public/img/`,
@@ -80,7 +81,6 @@ edit them directly.
 ```sh
 pnpm build
 pnpm cards   # redraw share cards, then build
-pnpm motion  # record project clips from motion/ (or: pnpm motion <slug>)
 pnpm dev
 ```
 

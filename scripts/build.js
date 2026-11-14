@@ -161,8 +161,8 @@ const imageSize = (src) => {
 };
 
 // A project's picture is found by its name: public/img/work/<slug>.webp, and
-// beside it <slug>.mp4 when the project has a clip (drawn from motion/<slug>.html
-// by `pnpm motion`). The clip loops silently; the picture is its poster, and
+// beside it <slug>.mp4 when the project has a clip (recorded from the scene
+// motion/<slug>.html). The clip loops silently; the picture is its poster, and
 // stands in for it for readers who ask for less motion.
 const mediaHtml = (label) => {
   const base = `/img/work/${slugOf(label)}`;
