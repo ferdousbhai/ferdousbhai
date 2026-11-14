@@ -186,7 +186,7 @@ main() {
   fi
   if (( ${#failed[@]} )); then
     echo "Did not install: $(for id in "${failed[@]}"; do printf '%s, ' "${NAME[$id]}"; done | sed 's/, $//')" >&2
-    echo "Run this again to retry; what is installed stays as it is." >&2
+    echo "Run this again to retry." >&2
     exit 1
   fi
 }
