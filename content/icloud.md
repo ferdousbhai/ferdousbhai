@@ -13,7 +13,7 @@ One command installs all of them, then opens Apple's own sign in page once. Ever
 
 {install:icloud}
 
-Each app adds its own signed package repository, so `omarchy update` keeps it current with the rest of your system. The command is safe to run again, and you can [read the script](https://ferdousbhai.com/icloud/install.sh) first. To install only some, name them, from `icloud` (Notes, Reminders, Contacts, Photos, Find My and iCloud Drive), `cloudmail`, `cloud-calendar` and `recall`:
+Each app adds its own signed package repository, so `omarchy update` keeps it current with the rest of your system. The command is safe to run again, and you can [read the script](https://ferdousbhai.com/icloud/install.sh) first. To install only some, name them, from `icloud` (Notes, Reminders, Photos, Find My and iCloud Drive), `cloudmail`, `cloud-calendar`, `cloud-contacts` and `recall`:
 
 ```sh
 curl -fsSL https://ferdousbhai.com/icloud/install.sh | sudo bash -s -- icloud cloud-calendar
@@ -102,11 +102,9 @@ curl -fsSL https://ferdousbhai.com/icloud-reminders/install.sh | sudo bash
 
 ## Contacts {#contacts}
 
-Your iCloud address book: search, add, edit and delete contacts, and export them as vCards.
+Your iCloud address book, and your Google contacts beside it if you add that account: search, add, edit and delete contacts, and export them as vCards. With both, Cloud Contacts can keep them the same, so a contact saved on your iPhone shows up on an Android phone too. It's an app of its own, [Cloud Contacts](https://github.com/ferdousbhai/cloud-contacts), on the same iCloud sign in.
 
-```sh
-curl -fsSL https://ferdousbhai.com/icloud-contacts/install.sh | sudo bash
-```
+{install:cloud-contacts}
 
 ## Mail and Calendar {#more}
 
@@ -116,4 +114,4 @@ These live in apps of their own, because mail and invitations arrive at your oth
 
 - [Source and issues](https://github.com/ferdousbhai/icloud-for-omarchy)
 - [Releases](https://github.com/ferdousbhai/icloud-for-omarchy/releases)
-- The install scripts, to read before running: [everything](https://ferdousbhai.com/icloud/install.sh), [Notes, Reminders, Contacts, Photos, Find My and iCloud Drive](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh), [Notes](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh), [Photos](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh), [Find My](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh), [iCloud Drive](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-drive.sh), [Reminders](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh), [Contacts](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-contacts.sh)
+- The install scripts, to read before running: [everything](https://ferdousbhai.com/icloud/install.sh), [Notes, Reminders, Photos, Find My and iCloud Drive](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install.sh), [Notes](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-notes.sh), [Photos](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-photos.sh), [Find My](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-findmy.sh), [iCloud Drive](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-drive.sh), [Reminders](https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh), [Cloud Contacts](https://github.com/ferdousbhai/cloud-contacts/releases/latest/download/install.sh)
