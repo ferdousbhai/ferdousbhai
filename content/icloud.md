@@ -102,7 +102,7 @@ curl -fsSL https://ferdousbhai.com/icloud-reminders/install.sh | sudo bash
 
 ## Contacts {#contacts}
 
-Your iCloud address book, and your Google contacts beside it if you add that account: search, add, edit and delete contacts, and export them as vCards. With both, Cloud Contacts can keep them the same, so a contact saved on your iPhone shows up on an Android phone too. It's an app of its own, [Cloud Contacts](https://github.com/ferdousbhai/cloud-contacts), on the same iCloud sign in.
+Your iCloud address book, and your Google contacts beside it if you add that account: search, add, edit and delete contacts, and export them as vCards. With both, Cloud Contacts can mirror them, so a contact saved on your iPhone shows up on an Android phone too. It's an app of its own, [Cloud Contacts](https://github.com/ferdousbhai/cloud-contacts), on the same iCloud sign in.
 
 {install:cloud-contacts}
 
