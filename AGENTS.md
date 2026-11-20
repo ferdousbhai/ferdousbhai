@@ -31,7 +31,7 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   which asks about one with an `offer` (the question); `icloud` is the command that links the
   iCloud sign in to it, `hint` a line said once it is in, and `script` its own installer where its
   one-liner is the iCloud installer itself.
-  Ghost's `skills/ghost-products/products.json` is a copy for agents: change this one, then copy
+  Ghost's `packages/daemon/src/products.json` (shown by `ghost help products`) is a copy for agents: change this one, then copy
   it there. Its `host` entry is Ghost itself, which that skill's table must skip (Ghost's
   `scripts/ghost-products.ts` doesn't yet).
 - `scripts/icloud-install.sh` — the iCloud installer: every iCloud app in one run. The build writes
