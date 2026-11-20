@@ -1,11 +1,11 @@
 ---
 title: Lastbook
-description: An offline survival library for Omarchy. Manuals, videos, encyclopedias, a world map and a local AI that cites its sources, all on your computer.
+description: An offline survival library for Omarchy. Manuals, videos, encyclopedias and a world map, all on your computer, for you and for your AI agents.
 ---
 
 # Lastbook
 
-Survival, first aid, health, water, food, power and repair: manuals and PDFs, videos with transcripts, offline encyclopedias, short guides for urgent needs and a map of the world, in one native Omarchy window. After setup it needs no internet. Chat answers questions from the library with a local AI and cites the pages it read.
+Survival, first aid, health, water, food, power and repair: manuals and PDFs, videos with transcripts, offline encyclopedias, short guides for urgent needs and a map of the world, in one native Omarchy window. After setup it needs no internet. The AI agents on your computer can search it and cite its pages.
 
 ## Install
 
@@ -13,11 +13,11 @@ Survival, first aid, health, water, food, power and repair: manuals and PDFs, vi
 
 For Omarchy on x86_64 and aarch64 (Apple silicon through Asahi). Adds Lastbook's signed package repository and installs it. It offers Recall for meaning-based search; without Recall, search matches words. Updates arrive with `omarchy update`.
 
-Open Lastbook from the application menu. First-run setup downloads the library you choose (Small, Medium or All), makes the map and, if the computer can run it, downloads the local AI (about 17 GB).
+Open Lastbook from the application menu. First-run setup downloads the library you choose (Small, Medium or All) and makes the map.
 
 ## In the window
 
-Search, Chat, Guides, Library, Videos, Map and Saved. Guides point to real pages with page numbers, and say what they don't cover. The map shows the whole world to city level, with street detail and help points (hospitals, pharmacies, shelters, drinking water) for the regions you pick. Setup cuts the map from OpenStreetMap on your own computer, so nothing is hosted and your location is never detected.
+Search, Guides, Library, Videos, Map and Saved. Guides point to real pages with page numbers, and say what they don't cover. The map shows the whole world to city level, with street detail and help points (hospitals, pharmacies, shelters, drinking water) for the regions you pick. Setup cuts the map from OpenStreetMap on your own computer, so nothing is hosted and your location is never detected.
 
 ## For agents
 
@@ -32,7 +32,7 @@ lastbook status
 lastbook skill install
 ```
 
-`lastbook skill install` teaches AI agents on the computer to use it.
+`lastbook skill install` (the installer runs it) teaches the AI agents on the computer to search the library, read the pages and cite them by title, publisher and page number. Lastbook has no AI of its own.
 
 ## Open source
 
