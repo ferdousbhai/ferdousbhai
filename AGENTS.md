@@ -32,8 +32,7 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   iCloud sign in to it, `hint` a line said once it is in, and `script` its own installer where its
   one-liner is the iCloud installer itself.
   Ghost's `packages/daemon/src/products.json` (shown by `ghost help products`) is a copy for agents: change this one, then copy
-  it there. Its `host` entry is Ghost itself, which that skill's table must skip (Ghost's
-  `scripts/ghost-products.ts` doesn't yet).
+  it there. Its `host` entry is Ghost itself, which that guide's table skips.
 - `scripts/icloud-install.sh` — the iCloud installer: every iCloud app in one run. The build writes
   the catalog over its `# {products}` line and serves it at `/icloud/install.sh` (generated,
   gitignored; `_redirects` must not redirect that path). It runs each product's own installer,

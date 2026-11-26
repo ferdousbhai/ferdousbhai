@@ -1,11 +1,11 @@
 ---
 title: Ghost
-description: An orchestration layer for all your agent harnesses on Omarchy.
+description: Your own persona on Omarchy, answered by a model on your machine.
 ---
 
 # Ghost
 
-An orchestration layer for your agent harnesses on [Omarchy](https://omarchy.org). Ghost runs the agent CLIs you already use (Claude Code, Codex, Grok, OpenCode, pi) with their own sign-ins, tools and limits. Give a ghost a character and a job: tidy a folder, fill in a form on a site you're signed into, check something every morning, or hand a coding task to your other agents. It works your apps, browser and files, keeps going on long tasks, and asks when a decision is yours. Each ghost keeps its notes as plain files in your Documents; Ghost and your files stay on your computer.
+Your own persona on [Omarchy](https://omarchy.org), answered by a model on your machine. Give your ghost a character and talk to it in its window, in the terminal, or from your phone. It works with your notes, mail, calendar, photos and files through the apps that already hold them, runs commands for you, and hands coding work to the coding agent you already use. It keeps its notes as plain files in your Documents, keeps going on long tasks, and asks when a decision is yours. Every turn runs on a local model, so none of it leaves your computer.
 
 ## Install {#app}
 
@@ -19,18 +19,9 @@ Omarchy's package repository can take a day to carry a new release. For the late
 
 ```sh
 curl -fsSL https://ferdousbhai.com/ghost/install.sh | bash
-``` You need at least one agent CLI; OpenCode's free models work without signing in.
-
-## ghost-desktop {#desktop}
-
-Computer use for any MCP agent: see the screen, click, type, switch windows. It never touches a locked screen, and agents take turns. Included in Ghost; on its own it needs [Bun](https://bun.sh):
-
-```sh
-bun install -g github:ferdousbhai/ghost-desktop
-claude mcp add --scope user desktop -- ghost-desktop
 ```
 
-[Source and issues](https://github.com/ferdousbhai/ghost-desktop), Apache-2.0.
+Ghost needs a model on your machine: a GGUF file and `llama-server`. The getting started guide covers both.
 
 ## Links
 
