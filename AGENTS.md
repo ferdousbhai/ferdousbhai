@@ -69,7 +69,8 @@ Design work follows the skills in `.claude/skills/` (`landing-page-design`,
   without byte ranges, and Safari plays video only from a server that answers a Range request
   with 206, so it slices the clip. Everything else is served by the assets directly.
 - `cloudflare.config.ts` — Worker settings (name, compatibility date, the script, which paths run
-  it first); `wrangler.config.ts` — asset directory and build command
+  it first); `vite.config.ts` — what `cf dev` and `cf deploy` build through (Cloudflare's Vite
+  plugin): it runs `scripts/build.js`, then Vite copies `public/` whole into the Worker's assets
 
 Generated and gitignored outputs are every `public/*.html` and `public/*.md`, `public/llms.txt`,
 `public/llms-full.txt`, `public/robots.txt`, `public/sitemap.xml`, and `public/_headers`. Do not
@@ -87,7 +88,7 @@ Production deploys from `main` through Workers Builds; do not run the manual dep
 
 ## Cloudflare CLI
 
-Use the `cf` CLI for Cloudflare work in this repository: deploys, builds and their
-logs, secrets, D1, R2, Tunnels and network routes. Use Wrangler or the dashboard
-only where `cf` has no command for the task. Find commands with
+Use the `cf` CLI alone for Cloudflare work in this repository: deploys, builds and
+their logs, secrets, D1, R2, Tunnels and network routes. No Wrangler, as a command,
+a config file or a dependency. Find commands with
 `cf cli search "<what you want to do>"`, then check `<command> --help`.
