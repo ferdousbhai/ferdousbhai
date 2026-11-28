@@ -18,7 +18,7 @@
 /cloud-contacts/install.sh https://github.com/ferdousbhai/cloud-contacts/releases/latest/download/install.sh 302
 # Cloud Tasks was retired for iCloud Reminders (2026-11-14).
 /cloud-tasks/install.sh https://github.com/ferdousbhai/icloud-for-omarchy/releases/latest/download/install-reminders.sh 302
-/wacli/install.sh https://github.com/ferdousbhai/wacli-for-omarchy/releases/latest/download/install.sh 302
+/wacli/install.sh https://github.com/ferdousbhai/messages-for-omarchy/releases/latest/download/install.sh 302
 /keep-going/install.sh https://github.com/ferdousbhai/keep-going/releases/latest/download/install.sh 302
 /lastbook/install.sh https://github.com/ferdousbhai/lastbook-for-omarchy/releases/latest/download/install.sh 302
 /ghost/install.sh https://github.com/ferdousbhai/ghost/releases/latest/download/install.sh 302

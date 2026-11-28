@@ -73,7 +73,7 @@
       "id": "wacli",
       "need": "Your WhatsApp chats kept as folders on your computer, and messages sent when you ask",
       "name": "wacli",
-      "source": "https://github.com/ferdousbhai/wacli-for-omarchy",
+      "source": "https://github.com/ferdousbhai/messages-for-omarchy",
       "cli": "wacli",
       "skill": "wacli",
       "install": "curl -fsSL https://ferdousbhai.com/wacli/install.sh | sudo bash",
